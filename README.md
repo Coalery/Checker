@@ -3,4 +3,7 @@
 
 HTML 파일이 서식을 가집니다.
 
-작업시간 : 6
+작업시간 : 6H
+
+# 참고자료
+https://github.com/barteksc/java-printable-view // Printer
