@@ -6,4 +6,4 @@ HTML 파일이 서식을 가집니다.
 작업시간 : 6H
 
 # 참고자료
-https://github.com/barteksc/java-printable-view // Printer
+https://github.com/barteksc/java-printable-view // "PrintPreview.java" 클래스를 가져왔습니다.
