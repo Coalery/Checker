@@ -155,7 +155,6 @@ public class P_MainPanel extends JPanel {
 			
 			JPanel buttonsPanel = new JPanel();
 			buttonsPanel.add(printButton);
-			buttonsPanel.add(_preview.getControls());
 			
 			preview.getContentPane().add(_preview, BorderLayout.CENTER);
 			preview.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
