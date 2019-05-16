@@ -229,7 +229,7 @@ public class P_MainPanel extends JPanel {
 			e.printStackTrace(System.err);
 			return;
 		}
-		ArrayList<Student> students = Util.readData();
+		ArrayList<ETC_Student> students = Util.readData();
 		int i;
 		for(i=0; i<students.size(); i++)
 			if(students.get(i).getNumber() == inpNumber) {

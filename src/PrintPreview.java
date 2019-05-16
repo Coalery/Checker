@@ -14,14 +14,14 @@ import javax.swing.JScrollPane;
 @SuppressWarnings("serial")
 public class PrintPreview extends JScrollPane {
 	private Printable pr;
-	private PageFormat pf;
+	private PageFormat p;
 
-	public PrintPreview(final Printable pr, final PageFormat pf) {
+	public PrintPreview(final Printable pr, final PageFormat p) {
 		this.pr = pr;
-		this.pf = pf;
+		this.p = p;
 		
-		Dimension size = new Dimension((int) pf.getPaper().getWidth(), (int) pf.getPaper().getHeight());
-		if (pf.getOrientation() != PageFormat.PORTRAIT)
+		Dimension size = new Dimension((int) p.getPaper().getWidth(), (int) p.getPaper().getHeight());
+		if (p.getOrientation() != PageFormat.PORTRAIT)
 			size = new Dimension(size.height, size.width);
 		JLabel label = new JLabel();
 		label.setHorizontalAlignment(JLabel.CENTER);
@@ -30,12 +30,12 @@ public class PrintPreview extends JScrollPane {
 		Graphics g = mImage.getGraphics();
 		Color c = g.getColor();
 		g.setColor(Color.white);
-		g.fillRect(0, 0, (int) pf.getWidth(), (int) pf.getHeight());
+		g.fillRect(0, 0, (int) p.getWidth(), (int) p.getHeight());
 		g.setColor(c);
 		try {
-			pr.print(g, pf, 0);
+			pr.print(g, p, 0);
 			g.setColor(Color.black);
-			g.drawRect(0, 0, (int)pf.getWidth()-1, (int)pf.getHeight()-1);
+			g.drawRect(0, 0, (int)p.getWidth()-1, (int)p.getHeight()-1);
 		} catch (Exception ex) {}
 		label.setIcon(new ImageIcon(mImage));
 		
@@ -45,15 +45,14 @@ public class PrintPreview extends JScrollPane {
 	public void print() {
 		try {
 			PrinterJob pj = PrinterJob.getPrinterJob();
-			pj.defaultPage(pf);
+			pj.defaultPage(p);
 			pj.setPrintable(new Printable() {public int print(Graphics g, PageFormat fmt, int index) {
 				if (index > 0) return Printable.NO_SUCH_PAGE;
 				try { return pr.print(g, fmt, 0); } catch (Exception ex) {}
 				return Printable.PAGE_EXISTS;
 			}});
-			javax.print.attribute.HashPrintRequestAttributeSet pra = new javax.print.attribute.HashPrintRequestAttributeSet();
-			if (pj.printDialog(pra))
-				pj.print(pra);
+			if (pj.printDialog())
+				pj.print();
 		} catch (Exception ex) {
 			JOptionPane.showMessageDialog(null, ex.toString(), "Error in Printing", 1);
 		}
