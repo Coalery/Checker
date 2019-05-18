@@ -30,6 +30,10 @@ public class F_StartFrame extends JFrame {
 	private JPanel radioHeadPanel;
 	private JPanel centerPanel;
 	
+	private P_FirstPanel firstP;
+	private P_SecondPanel secondP;
+	private P_ThirdPanel thirdP;
+	
 	public F_StartFrame() {
 		super("Checker");
 		setSize(400, 500);
@@ -72,7 +76,7 @@ public class F_StartFrame extends JFrame {
 		}});
 		
 		JMenuItem option = new JMenuItem("옵션");
-		option.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {new F_OptionFrame(true);}});
+		option.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {new D_OptionDialog(F_StartFrame.this, true);}});
 		
 		menu.add(modifyData);
 		menu.add(option);
@@ -85,12 +89,12 @@ public class F_StartFrame extends JFrame {
 		ButtonGroup rbGroup = new ButtonGroup();
 		JRadioButton rb1 = new JRadioButton("현장체험");
 		JRadioButton rb2 = new JRadioButton("결석");
-		JRadioButton rb3 = new JRadioButton("조퇴·결과·지각·외출");
+		JRadioButton rb3 = new JRadioButton("조퇴·결과·지각");
 		rb1.setSelected(true);
 		
-		rb1.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) { card.show(centerPanel, "First"); }});
-		rb2.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) { card.show(centerPanel, "Second"); }});
-		rb3.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) { card.show(centerPanel, "Third"); }});
+		rb1.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) { card.show(centerPanel, "First"); firstP.initPanel(); }});
+		rb2.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) { card.show(centerPanel, "Second"); secondP.initPanel(); }});
+		rb3.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) { card.show(centerPanel, "Third"); thirdP.initPanel(); }});
 		
 		c = new GridBagConstraints();
 		c.weightx = 1.0;
@@ -113,9 +117,13 @@ public class F_StartFrame extends JFrame {
 		
 		add(centerPanel, "Center");
 		
-		centerPanel.add("First", new P_FirstPanel());
-		centerPanel.add("Second", new P_SecondPanel());
-		centerPanel.add("Third", new P_ThirdPanel());
+		firstP = new P_FirstPanel(F_StartFrame.this);
+		secondP = new P_SecondPanel(F_StartFrame.this);
+		thirdP = new P_ThirdPanel();
+		
+		centerPanel.add("First", firstP);
+		centerPanel.add("Second", secondP);
+		centerPanel.add("Third", thirdP);
 		
 		setResizable(false);
 		setVisible(true);

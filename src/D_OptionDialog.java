@@ -2,19 +2,18 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 @SuppressWarnings("serial")
-public class F_OptionFrame extends JFrame {
+public class D_OptionDialog extends JDialog {
 	
 	private final int LAYOUT_PANEL_OPTION_COUNT = 10;
 	private final int OPTION_PANEL_COUNT = 2;
@@ -22,8 +21,8 @@ public class F_OptionFrame extends JFrame {
 	private JPanel[] optionPanels;
 //	private int selectIndex;
 	
-	public F_OptionFrame(boolean visible) {
-		super("옵션");
+	public D_OptionDialog(JFrame owner, boolean visible) {
+		super(owner, "옵션", true);
 		addWindowListener(new WindowAdapter() {public void windowClosing(WindowEvent event) {
 			dispose();
 			setVisible(false);
@@ -75,7 +74,6 @@ public class F_OptionFrame extends JFrame {
 		String[] labelName = {"결석계", "학습 계획서", "학부모 동의서", "학습 결과 보고서", "lay4", "lay5", "lay6", "lay7", "lay8", "lay9"};
 		
 		for(int i=0; i<LAYOUT_PANEL_OPTION_COUNT; i++) {
-			
 			labels[i] = new JLabel(labelName[i]);
 			labels[i].setSize(140, 20);
 			labels[i].setLocation(30, 10 + 25*i);
@@ -83,13 +81,11 @@ public class F_OptionFrame extends JFrame {
 			locFields[i] = new JTextField();
 			locFields[i].setSize(250, 20);
 			locFields[i].setLocation(150, 10 + 25*i);
+			locFields[i].setEditable(false);
 			
 			String path = Util.getConfig("lay" + i + "_LOCATION");
 			if(path != null)
 				locFields[i].setText(path);
-			
-			LO_Listener listen = new LO_Listener("lay" + i, locFields[i]);
-			locFields[i].addFocusListener(listen);
 			
 			JButton button = new JButton("찾기");
 			button.setSize(60, 20);
@@ -98,7 +94,7 @@ public class F_OptionFrame extends JFrame {
 			button.setFocusPainted(false);
 			button.setOpaque(true);
 			button.setBackground(Color.WHITE);
-			button.addActionListener(listen);
+			button.addActionListener(new LO_Listener("lay" + i, locFields[i]));
 			
 			optionPanels[1].add(labels[i]);
 			optionPanels[1].add(locFields[i]);
@@ -140,7 +136,7 @@ public class F_OptionFrame extends JFrame {
 	 * @author Coalery (김현우)
 	 * 기능 : 옵션 - 레이아웃 부분에서 추가되는 버튼들에 추가될 리스너의 기능을 구현함. 
 	 */
-	private class LO_Listener extends FocusAdapter implements ActionListener {
+	private class LO_Listener implements ActionListener {
 		
 		private String targetName;
 		private JTextField text;
@@ -156,11 +152,6 @@ public class F_OptionFrame extends JFrame {
 			if(path == null)
 				return;
 			text.setText(path);
-			Util.changeConfig(targetName + "_LOCATION", text.getText());
-		}
-		
-		@Override
-		public void focusLost(FocusEvent event) {
 			Util.changeConfig(targetName + "_LOCATION", text.getText());
 		}
 		

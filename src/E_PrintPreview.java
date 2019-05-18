@@ -12,11 +12,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 
 @SuppressWarnings("serial")
-public class PrintPreview extends JScrollPane {
+public class E_PrintPreview extends JScrollPane {
 	private Printable pr;
 	private PageFormat p;
 
-	public PrintPreview(final Printable pr, final PageFormat p) {
+	public E_PrintPreview(final Printable pr, final PageFormat p) {
 		this.pr = pr;
 		this.p = p;
 		

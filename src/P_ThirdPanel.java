@@ -15,4 +15,8 @@ public class P_ThirdPanel extends JPanel {
 		add(new JLabel("Third"), "Center");
 	}
 	
+	public void initPanel() {
+		
+	}
+	
 }

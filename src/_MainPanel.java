@@ -27,7 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
 @SuppressWarnings("serial")
-public class P_MainPanel extends JPanel {
+public class _MainPanel extends JPanel {
 	
 	public static final int PANEL_SIZE_X = 400;
 	public static final int PANEL_SIZE_Y = 500;
@@ -39,7 +39,7 @@ public class P_MainPanel extends JPanel {
 	private JComboBox<String> time_F;
 	private JComboBox<String> time_S;
 	
-	public P_MainPanel() {
+	public _MainPanel() {
 		setLayout(null);
 		String[] type_items = {"조퇴증", "외출증", "보건실 입실증"};
 		String[] time_items = {"없음", "1교시", "2교시", "3교시", "4교시", "5교시", "6교시", "7교시"};
@@ -138,7 +138,7 @@ public class P_MainPanel extends JPanel {
 			set.add(OrientationRequested.PORTRAIT);
 			PageFormat pf = PrinterJob.getPrinterJob().getPageFormat(set);
 			
-			final PrintPreview _preview = new PrintPreview(origin.getPrintable(null, null), pf);
+			final E_PrintPreview _preview = new E_PrintPreview(origin.getPrintable(null, null), pf);
 			
 			JButton printButton = new JButton("인쇄");
 			printButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
@@ -229,7 +229,7 @@ public class P_MainPanel extends JPanel {
 			e.printStackTrace(System.err);
 			return;
 		}
-		ArrayList<ETC_Student> students = Util.readData();
+		ArrayList<E_Student> students = Util.readData();
 		int i;
 		for(i=0; i<students.size(); i++)
 			if(students.get(i).getNumber() == inpNumber) {

@@ -1,9 +1,9 @@
 
-public class ETC_Student {
+public class E_Student {
 	private int number;
 	private String name;
 	
-	public ETC_Student(int number, String name) {
+	public E_Student(int number, String name) {
 		this.number = number;
 		this.name = name;
 	}
