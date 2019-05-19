@@ -1,16 +1,6 @@
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -23,12 +13,10 @@ import javax.swing.JTextField;
  */
 
 @SuppressWarnings("serial")
-public class P_SecondPanel extends JPanel {
+public class P_SecondPanel extends P_PanelParent {
 	
 	private JFrame parent;
 	
-	private JTextField number;
-	private JTextField name;
 	private JTextArea reason;
 	private T_CalendarTextField absence_start;
 	private T_CalendarTextField absence_end;
@@ -38,18 +26,11 @@ public class P_SecondPanel extends JPanel {
 	
 	public P_SecondPanel(JFrame parent) {
 		// <DefaultSetting>
-		setLayout(null);
+		super();
 		this.parent = parent;
 		// </DefaultSetting>
 		
 		// <Define>
-		JLabel number_L = new JLabel("학번 : ");
-		number = new JTextField();
-		JButton numberConfirm = Util.getDefaultButton(new JButton("검색"), Color.WHITE, true);
-		
-		JLabel name_L = new JLabel("이름 : ");
-		name = new JTextField();
-		
 		JLabel reason_L = new JLabel("사유 : ");
 		reason = new JTextArea();
 		JScrollPane reason_sp = new JScrollPane(reason, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -72,30 +53,11 @@ public class P_SecondPanel extends JPanel {
 		// </Define>
 		
 		// <Setting>
-		name.setToolTipText("학번을 입력하면 자동으로 입력됩니다.");
-		name.setEditable(false);
-		name.setFocusable(false);
-		number.addKeyListener(new KeyAdapter() {public void keyPressed(KeyEvent e) {
-			if(e.getKeyCode() == KeyEvent.VK_ENTER)
-				numberConfirm();
-			else if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-				name.setText("");
-				number.setText("");
-			}
-		}});
-		numberConfirm.setFocusable(false);
-		numberConfirm.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
-			numberConfirm();
-		}});
 		reason.setLineWrap(true);
 		reason.setWrapStyleWord(true);
 		// </Setting>
 		
-		// <SetingLabel>
-		number_L.setSize(60, 30);
-		number_L.setLocation(20, 20);
-		name_L.setSize(60, 30);
-		name_L.setLocation(20, 60);
+		// <SettingLabel>
 		reason_L.setSize(60, 30);
 		reason_L.setLocation(20, 100);
 		absence_L.setSize(80, 30);
@@ -113,12 +75,6 @@ public class P_SecondPanel extends JPanel {
 		// </SettingLabel>
 		
 		// <SettingComponents>
-		number.setSize(200, 30);
-		number.setLocation(90, 20);
-		numberConfirm.setSize(60, 29);
-		numberConfirm.setLocation(310, 20);
-		name.setSize(200, 30);
-		name.setLocation(90, 60);
 		reason_sp.setSize(200, 90);
 		reason_sp.setLocation(90, 100);
 		absence_start.setSize(95, 30);
@@ -134,8 +90,6 @@ public class P_SecondPanel extends JPanel {
 		// </SettingComponents>
 		
 		// <AddToPanel>
-		add(number_L); add(number); add(numberConfirm);
-		add(name_L); add(name);
 		add(reason_L); add(reason_sp);
 		add(absence_L); add(absence_count_L); add(absence_start); add(absence_end); add(absence_count);
 		add(absence_type_L); add(absence_type);
@@ -144,39 +98,17 @@ public class P_SecondPanel extends JPanel {
 		// </AddToPanel>
 	}
 	
-	private void numberConfirm() {
-		int inpNumber = -1;
-		if(number.getText().length() == 0) {
-			Util.showMessage("학번을 입력하지 않았습니다.", JOptionPane.ERROR_MESSAGE);
-			name.setText("");
-			return;
-		}
-		try {
-			inpNumber = Integer.parseInt(number.getText());
-		} catch(NumberFormatException e) {
-			Util.showMessage("학번을 숫자로 입력해주세요.", JOptionPane.ERROR_MESSAGE);
-			number.setText("");
-			name.setText("");
-			e.printStackTrace(System.err);
-			return;
-		}
-		ArrayList<E_Student> students = Util.readData();
-		int i;
-		for(i=0; i<students.size(); i++)
-			if(students.get(i).getNumber() == inpNumber) {
-				name.setText(students.get(i).getName());
-				break;
-			}
-		if(i == students.size()) {
-			Util.showMessage("정보가 존재하지 않습니다.", JOptionPane.ERROR_MESSAGE);
-			number.setText("");
-			name.setText("");
-		}
-	}
-	
 	public void initPanel() {
 		number.setText("");
 		name.setText("");
+		reason.setText("");
+		absence_start.setOriginText("");
+		absence_start.setText("");
+		absence_end.setOriginText("");
+		absence_end.setText("");
+		absence_count.setText("");
+		absence_type.setSelectedIndex(0);
+		absence_method.setSelectedIndex(0);
 	}
 	
 }

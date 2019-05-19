@@ -37,7 +37,9 @@ public class Util {
 				String[] read = line.split(";");
 				
 				for(int i=0; i<read.length; i++) {
-					try { result.add(new E_Student(Integer.parseInt(read[i].split(":")[0]), read[i].split(":")[1])); } catch (NumberFormatException ex) {}
+					String[] spl = read[i].split(":");
+					if(spl.length != 3) continue;
+					try { result.add(new E_Student(Integer.parseInt(spl[0]), spl[1], spl[2])); } catch (NumberFormatException ex) {}
 				}
 			}
 		} catch (IOException e) {
