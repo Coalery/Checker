@@ -1,4 +1,5 @@
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -13,6 +14,7 @@ public class P_ThirdPanel extends P_PanelParent {
 	
 	private JTextArea reason;
 	private JCheckBox[] range;
+	private JComboBox<String> range_method;
 	
 	public P_ThirdPanel() {
 		// <DefaultSetting>
@@ -31,6 +33,8 @@ public class P_ThirdPanel extends P_PanelParent {
 		for(int i=0; i<range.length; i++) range[i] = new JCheckBox();
 		for(int i=0; i<range_specific_L.length; i++) range_specific_L[i] = new JLabel(String.valueOf(i+1), JLabel.CENTER);
 		
+		JLabel range_method_L = new JLabel("확인방법 : ");
+		range_method = new JComboBox<>(new String[] {"학생과 면담", "증빙서류 확인", "보호자 확인"});
 		// </Define>
 		
 		// <Setting>
@@ -50,6 +54,8 @@ public class P_ThirdPanel extends P_PanelParent {
 			range_specific_L[i].setSize(15, 30);
 			range_specific_L[i].setLocation(90 + (int)(i*30.85f), 220);
 		}
+		range_method_L.setSize(80, 30);
+		range_method_L.setLocation(20, 257);
 		// </SettingLabel>
 		
 		// <SettingComponents>
@@ -59,6 +65,8 @@ public class P_ThirdPanel extends P_PanelParent {
 			range[i].setSize(15, 15);
 			range[i].setLocation(90 + (int)(i*30.85f), 207);
 		}
+		range_method.setSize(200, 30);
+		range_method.setLocation(90, 257);
 		// </SettingComponents>
 		
 		// <AddToPanel>
@@ -66,6 +74,7 @@ public class P_ThirdPanel extends P_PanelParent {
 		add(range_L);
 		for(int i=0; i<range_specific_L.length; i++) add(range_specific_L[i]);
 		for(int i=0; i<range.length; i++) add(range[i]);
+		add(range_method_L); add(range_method);
 		// </AddToPanel>
 	}
 	
@@ -73,9 +82,9 @@ public class P_ThirdPanel extends P_PanelParent {
 		number.setText("");
 		name.setText("");
 		reason.setText("");
-		for(int i=1; i<range.length; i++)
+		for(int i=0; i<range.length; i++)
 			range[i].setSelected(false);
-		range[0].setSelected(true);
+		range_method.setSelectedIndex(0);
 	}
 	
 }

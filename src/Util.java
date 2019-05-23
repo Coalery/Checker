@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,12 +20,14 @@ public class Util {
 	
 	public static ArrayList<E_Student> readData() {
 		ArrayList<E_Student> result = new ArrayList<E_Student>();
-		FileReader fr = null;
+		FileInputStream fis = null;
+		InputStreamReader isr = null;
 		BufferedReader br = null;
 		
 		try {
-			fr = new FileReader("./data.hc");
-			br = new BufferedReader(fr);
+			fis = new FileInputStream("./data.hc");
+			isr = new InputStreamReader(fis, "UTF8");
+			br = new BufferedReader(isr);
 			
 			String line = null;
 			while((line = br.readLine()) != null) {
@@ -47,8 +50,10 @@ public class Util {
 		} finally {
 			if(br != null)
 				try { br.close(); } catch (IOException e) {e.printStackTrace(System.err);}
-			if(fr != null)
-				try { fr.close(); } catch (IOException e) {e.printStackTrace(System.err);}
+			if(isr != null)
+				try { isr.close(); } catch (IOException e) {e.printStackTrace(System.err);}
+			if(fis != null)
+				try { fis.close(); } catch (IOException e) {e.printStackTrace(System.err);}
 		}
 		
 		return result;
