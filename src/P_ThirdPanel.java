@@ -1,3 +1,5 @@
+import java.awt.Color;
+
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -16,6 +18,7 @@ public class P_ThirdPanel extends P_PanelParent {
 	private JCheckBox[] range;
 	private JComboBox<String> range_method;
 	
+	@SuppressWarnings("unchecked")
 	public P_ThirdPanel() {
 		// <DefaultSetting>
 		super();
@@ -34,7 +37,7 @@ public class P_ThirdPanel extends P_PanelParent {
 		for(int i=0; i<range_specific_L.length; i++) range_specific_L[i] = new JLabel(String.valueOf(i+1), JLabel.CENTER);
 		
 		JLabel range_method_L = new JLabel("확인방법 : ");
-		range_method = new JComboBox<>(new String[] {"학생과 면담", "증빙서류 확인", "보호자 확인"});
+		range_method = (JComboBox<String>) Util.getDefaultComponent(new JComboBox<>(new String[] {"학생과 면담", "증빙서류 확인", "보호자 확인"}), Color.WHITE);
 		// </Define>
 		
 		// <Setting>

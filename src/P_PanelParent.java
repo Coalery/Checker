@@ -16,6 +16,8 @@ public class P_PanelParent extends JPanel {
 	
 	protected JTextField number;
 	protected JTextField name;
+	protected JButton print;
+	protected String parentName;
 	
 	public P_PanelParent() {
 		// <DefaultSetting>
@@ -25,10 +27,12 @@ public class P_PanelParent extends JPanel {
 		// <Define>
 		JLabel number_L = new JLabel("학번 : ");
 		number = new JTextField();
-		JButton numberConfirm = Util.getDefaultButton(new JButton("검색"), Color.WHITE, true);
+		JButton numberConfirm = (JButton) Util.getDefaultComponent(new JButton("검색"), Color.WHITE, true);
 		
 		JLabel name_L = new JLabel("이름 : ");
 		name = new JTextField();
+		
+		print = (JButton) Util.getDefaultComponent(new JButton("인쇄"), new Color(200, 200, 200), true);
 		// </Define>
 		
 		// <Setting>
@@ -63,11 +67,14 @@ public class P_PanelParent extends JPanel {
 		numberConfirm.setLocation(310, 20);
 		name.setSize(200, 30);
 		name.setLocation(90, 60);
+		print.setSize(100, 30);
+		print.setLocation(140, 370);
 		// </SettingComponents>
 		
 		// <AddToPanel>
 		add(number_L); add(number); add(numberConfirm);
 		add(name_L); add(name);
+		add(print);
 		// </AddToPanel>
 	}
 	
@@ -84,7 +91,6 @@ public class P_PanelParent extends JPanel {
 			Util.showMessage("학번을 숫자로 입력해주세요.", JOptionPane.ERROR_MESSAGE);
 			number.setText("");
 			name.setText("");
-			e.printStackTrace(System.err);
 			return;
 		}
 		ArrayList<E_Student> students = Util.readData();
@@ -92,6 +98,7 @@ public class P_PanelParent extends JPanel {
 		for(i=0; i<students.size(); i++)
 			if(students.get(i).getNumber() == inpNumber) {
 				name.setText(students.get(i).getName());
+				parentName = students.get(i).getParentName();
 				break;
 			}
 		if(i == students.size()) {

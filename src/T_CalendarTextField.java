@@ -9,6 +9,7 @@ import javax.swing.JTextField;
 @SuppressWarnings("serial")
 public class T_CalendarTextField extends JTextField {
 	
+	private E_Calendar originData;
 	private String originText;
 	
 	public T_CalendarTextField(JFrame owner) {
@@ -16,7 +17,12 @@ public class T_CalendarTextField extends JTextField {
 		addKeyListener(new KeyAdapter() {public void keyReleased(KeyEvent e) {setText(originText);}});
 	}
 	
-	public void setOriginText(String originText) { this.originText = originText; }
+	public void setOrigin(E_Calendar originData) {
+		this.originData = originData;
+		originText = String.format("%04d/%02d/%02d", originData.getYear(), originData.getMonth(), originData.getDay());
+	}
+	
 	public String getOriginText() { return originText; }
+	public E_Calendar getOriginData() { return originData;}
 	
 }

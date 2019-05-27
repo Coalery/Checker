@@ -50,9 +50,9 @@ public class D_CalendarDialog extends JDialog {
 		upper.setLayout(new BorderLayout());
 		upper.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		
-		JButton left = Util.getDefaultButton(new JButton("◀"), Color.WHITE, true);
+		JButton left = (JButton) Util.getDefaultComponent(new JButton("◀"), Color.WHITE, true);
 		when = new JLabel(year + " / " + month, JLabel.CENTER);
-		JButton right = Util.getDefaultButton(new JButton("▶"), Color.WHITE, true);
+		JButton right = (JButton) Util.getDefaultComponent(new JButton("▶"), Color.WHITE, true);
 		
 		left.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
 			month--;
@@ -107,7 +107,7 @@ public class D_CalendarDialog extends JDialog {
 			if(list.get(i) == 0) {
 				calendar.add(new JPanel());
 			} else {
-				JButton date = Util.getDefaultButton(new JButton(list.get(i).toString()), Color.WHITE, false);
+				JButton date = (JButton) Util.getDefaultComponent(new JButton(list.get(i).toString()), Color.WHITE, false);
 				date.addActionListener(new CD_AcListener(year, month, list.get(i)));
 				date.setBorder(null);
 				calendar.add(date);
@@ -171,9 +171,8 @@ public class D_CalendarDialog extends JDialog {
     	
     	@Override
     	public void actionPerformed(ActionEvent event) {
-    		String s = String.format("%04d/%02d/%02d", year, month, day);
-    		textToWrite.setText(s);
-    		textToWrite.setOriginText(s);
+    		textToWrite.setText(String.format("%04d/%02d/%02d", year, month, day));
+    		textToWrite.setOrigin(new E_Calendar(year, month, day));
     		
     		D_CalendarDialog.this.setVisible(false);
     		D_CalendarDialog.this.dispose();

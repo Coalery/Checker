@@ -1,3 +1,5 @@
+import java.awt.Color;
+
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,6 +26,7 @@ public class P_SecondPanel extends P_PanelParent {
 	private JComboBox<String> absence_type;
 	private JComboBox<String> absence_method;
 	
+	@SuppressWarnings("unchecked")
 	public P_SecondPanel(JFrame parent) {
 		// <DefaultSetting>
 		super();
@@ -43,10 +46,10 @@ public class P_SecondPanel extends P_PanelParent {
 		absence_count = new JTextField();
 		
 		JLabel absence_type_L = new JLabel("결석유형 : ");
-		absence_type = new JComboBox<>(new String[] {"인정결", "병결"});
+		absence_type = (JComboBox<String>) Util.getDefaultComponent(new JComboBox<String>(new String[] {"인정결", "병결"}), Color.WHITE);
 		
 		JLabel absence_method_L = new JLabel("확인방법 : ");
-		absence_method = new JComboBox<>(new String[] {"학생과 면담", "증빙서류 확인", "보호자 확인"});
+		absence_method = (JComboBox<String>) Util.getDefaultComponent(new JComboBox<>(new String[] {"학생과 면담", "증빙서류 확인", "보호자 확인"}), Color.WHITE);
 		
 		JLabel teacher_L = new JLabel("선생님 : ");
 		JLabel teacher = new JLabel(Util.getConfig("teacher"));
@@ -102,9 +105,9 @@ public class P_SecondPanel extends P_PanelParent {
 		number.setText("");
 		name.setText("");
 		reason.setText("");
-		absence_start.setOriginText("");
+		absence_start.setOrigin(new E_Calendar(0, 0, 0));
 		absence_start.setText("");
-		absence_end.setOriginText("");
+		absence_end.setOrigin(new E_Calendar(0, 0, 0));
 		absence_end.setText("");
 		absence_count.setText("");
 		absence_type.setSelectedIndex(0);

@@ -72,6 +72,7 @@ public class F_StartFrame extends JFrame {
 		
 		JMenuItem modifyData = new JMenuItem("데이터 수정");
 		modifyData.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
+			Util.createDataFile();
 			Util.execCommand("notepad.exe data.hc");
 		}});
 		

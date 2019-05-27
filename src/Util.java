@@ -1,22 +1,72 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FileDialog;
-import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterJob;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.standard.MediaSizeName;
+import javax.print.attribute.standard.OrientationRequested;
 import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextPane;
+import javax.swing.JToggleButton;
 
 public class Util {
+	
+	public static void createDataFile() {
+		File dataFile = new File("./data.hc");
+		
+		if(!dataFile.exists()) {
+			FileOutputStream fos = null;
+			OutputStreamWriter osw = null;
+			BufferedWriter bw = null;
+			
+			try {
+				fos = new FileOutputStream("./data.hc");
+				osw = new OutputStreamWriter(fos, "UTF8");
+				bw = new BufferedWriter(osw);
+				
+				bw.write("# 맨 앞에 '#' 을 입력하면, 주석처리가 됩니다.");
+				bw.newLine();
+				bw.newLine();
+				bw.write("# < 작성법 >");
+				bw.newLine();
+				bw.write("# 학번:이름:학부모명(모)");
+				bw.newLine();
+				bw.write("# 예) 10101:OOO:AAA");
+				bw.newLine();
+			} catch(IOException e) {
+				e.printStackTrace(System.err);
+			} finally {
+				if(bw != null)
+					try { bw.close(); } catch(IOException e) { e.printStackTrace(System.err); }
+				if(osw != null)
+					try { osw.close(); } catch (IOException e) {e.printStackTrace(System.err);}
+				if(fos != null)
+					try { fos.close(); } catch (IOException e) {e.printStackTrace(System.err);}
+			}
+		}
+	}
 	
 	public static ArrayList<E_Student> readData() {
 		ArrayList<E_Student> result = new ArrayList<E_Student>();
@@ -37,13 +87,17 @@ public class Util {
 					line = line.substring(1);
 				if(line.charAt(0) == '#')
 					continue;
-				String[] read = line.split(";");
 				
-				for(int i=0; i<read.length; i++) {
-					String[] spl = read[i].split(":");
-					if(spl.length != 3) continue;
-					try { result.add(new E_Student(Integer.parseInt(spl[0]), spl[1], spl[2])); } catch (NumberFormatException ex) {}
-				}
+				String[] read = line.split(":");
+				if(read.length != 3) continue;
+				
+				try {
+					int number = Integer.parseInt(read[0]);
+					String name = read[1];
+					String parentName = read[2];
+					
+					result.add(new E_Student(number, name, parentName)); 
+				} catch (NumberFormatException ex) { continue; }
 			}
 		} catch (IOException e) {
 			e.printStackTrace(System.err);
@@ -234,38 +288,89 @@ public class Util {
 		return null;
 	}
 	
-	/**매개변수로 넣은 버튼에 여러가지 서식을 입힙니다. 버튼에 서식 입히기 귀찮아서 만들었다고 합니다.
+	/**매개변수로 넣은 버튼에 여러가지 서식을 입힙니다. JButton, JMenuItem, JToggleButton 은 다른 메서드를 사용해야 합니다.
 	 * @author Coalery ( 김현우 )
-	 * @param button : 서식을 적용할 버튼
-	 * @param c : 서식을 모두 적용하고 버튼에 입힐 색깔
-	 * @param isBorderPainted : 버튼의 외곽선 여부
-	 * @return 서식을 모두 적용한 버튼을 리턴한다.
-	 * @see javax.swing.JButton
+	 * @param button : 서식을 적용할 컴포넌트
+	 * @param c : 컴포넌트에 입힐 색깔
+	 * @return 서식을 모두 적용한 컴포넌트를 리턴한다.
+	 * @see javax.swing.JComponent
+	 * @see #getDefaultComponent(JComponent, Color, boolean)
 	 */
-	public static JButton getDefaultButton(JButton button, Color c, boolean isBorderPainted) {
-		button.setOpaque(true);
-		button.setBorderPainted(isBorderPainted);
-		button.setFocusPainted(false);
-		button.setBackground(c);
-		return button;
+	public static JComponent getDefaultComponent(JComponent component, Color c) {
+		component.setOpaque(true);
+		component.setBackground(c);
+		return component;
 	}
 	
-	/**매개변수로 넣은 버튼에 여러가지 서식을 입힙니다. 버튼에 서식 입히기 귀찮아서 만들었다고 합니다.
+	/**매개변수로 넣은 컴포넌트에 여러가지 서식을 입힙니다. JButton, JMenuItem, JToggleButton 만 사용 가능합니다.
 	 * @author Coalery ( 김현우 )
-	 * @param button : 서식을 적용할 버튼
-	 * @param c : 서식을 모두 적용하고 버튼에 입힐 색깔
-	 * @param f : 버튼의 텍스트 폰트 지정
-	 * @param isBorderPainted : 버튼의 외곽선 여부
-	 * @return 서식을 모두 적용한 버튼을 리턴한다.
+	 * @param button : 서식을 적용할 컴포넌트
+	 * @param c : 컴포넌트에 입힐 색깔
+	 * @param isBorderPainted : 컴포넌트의 외곽선 여부
+	 * @return 서식을 모두 적용한 컴포넌트를 리턴한다. 맞지 않는 컴포넌트인 경우 null 을 반환합니다.
+	 * @see javax.swing.AbstractButton
 	 * @see javax.swing.JButton
+	 * @see javax.swing.JMenuItem
+	 * @see javax.swing.JToggleButton
 	 */
-	public static JButton getDefaultButton(JButton button, Color c, Font f, boolean isBorderPainted) {
-		button.setOpaque(true);
-		button.setBorderPainted(isBorderPainted);
-		button.setFocusPainted(false);
-		button.setFont(f);
-		button.setBackground(c);
-		return button;
+	public static JComponent getDefaultComponent(JComponent component, Color c, boolean isBorderPainted) {
+		if(component instanceof JButton) {
+			JButton tmpButton = (JButton) component;
+			tmpButton.setBorderPainted(isBorderPainted);
+			tmpButton.setFocusPainted(false);
+			tmpButton.setOpaque(true);
+			tmpButton.setBackground(c);
+			return tmpButton;
+		} else if(component instanceof JMenuItem) {
+			JMenuItem tmpMenuItem = (JMenuItem) component;
+			tmpMenuItem.setBorderPainted(isBorderPainted);
+			tmpMenuItem.setFocusPainted(false);
+			tmpMenuItem.setOpaque(true);
+			tmpMenuItem.setBackground(c);
+			return tmpMenuItem;
+		} else if(component instanceof JToggleButton) {
+			JToggleButton tmpToggle = (JToggleButton) component;
+			tmpToggle.setBorderPainted(isBorderPainted);
+			tmpToggle.setFocusPainted(false);
+			tmpToggle.setOpaque(true);
+			tmpToggle.setBackground(c);
+			return tmpToggle;
+		}
+		return null;
 	}
     
+	public static void showPrintPreview(StringBuilder builder, String logContent) {
+		JTextPane origin = new JTextPane();
+		origin.setContentType("text/html; charset=UTF-8");
+		origin.setText(builder.toString());
+		
+		JDialog preview = new JDialog();
+		preview.setModal(true);
+		preview.setSize(700, 600);
+		preview.setLayout(new BorderLayout());
+		preview.setTitle("인쇄 미리보기");
+		
+		HashPrintRequestAttributeSet set = new HashPrintRequestAttributeSet();
+		set.add(MediaSizeName.ISO_A4);
+		set.add(OrientationRequested.PORTRAIT);
+		PageFormat pf = PrinterJob.getPrinterJob().getPageFormat(set);
+		
+		final E_PrintPreview _preview = new E_PrintPreview(origin.getPrintable(null, null), pf);
+		
+		JButton printButton = new JButton("인쇄");
+		printButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
+			_preview.print();
+			Util.log(logContent);
+		}});
+		
+		JPanel buttonsPanel = new JPanel();
+		buttonsPanel.add(printButton);
+		
+		preview.getContentPane().add(_preview, BorderLayout.CENTER);
+		preview.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
+		
+		preview.setResizable(false);
+		preview.setVisible(true);
+	}
+	
 }
