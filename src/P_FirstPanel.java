@@ -1,6 +1,7 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -58,16 +59,32 @@ public class P_FirstPanel extends P_PanelParent {
 			InputStreamReader isr = null;
 			BufferedReader br = null;
 			
+			String lay0_LOCATION = Util.getConfig("lay0_LOCATION");
+			String lay1_LOCATION = Util.getConfig("lay1_LOCATION");
+			String lay2_LOCATION = Util.getConfig("lay2_LOCATION");
+			String lay3_LOCATION = Util.getConfig("lay3_LOCATION");
+			
+			StringBuilder[] builder = new StringBuilder[4];
+			Calendar c = Calendar.getInstance();
+			String line;
+			
+			if(lay0_LOCATION == null || lay1_LOCATION == null || lay2_LOCATION == null || lay3_LOCATION == null) {
+				Util.showMessage("이 문서를 출력하기 위한 서식 파일 중 지정이 되지 않은 것이 있습니다.\n옵션에 들어가서 서식 파일의 경로를 지정해주세요.", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			if(!(new File(lay0_LOCATION).exists() && new File(lay1_LOCATION).exists() && new File(lay2_LOCATION).exists() && new File(lay3_LOCATION).exists())) {
+				Util.showMessage("해당 경로에 서식 파일이 존재하지 않습니다.\n옵션에 들어가서 서식 파일의 경로를 확인해주세요.", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
 			try {
-				fis = new FileInputStream(Util.getConfig("lay0_LOCATION"));
+				fis = new FileInputStream(lay0_LOCATION);
 				isr = new InputStreamReader(fis, "UTF-8");
 				br = new BufferedReader(isr);
 				
-				Calendar c = Calendar.getInstance();
-				StringBuilder builder = new StringBuilder();
-				String line;
+				builder[0] = new StringBuilder();
 				while((line = br.readLine()) != null)
-					builder.append(line
+					builder[0].append(line
 						.replace("$number", number.getText())
 						.replace("$name", name.getText())
 						.replace("$absc.tot", String.format("%d년 %d월 %d일 ~ %d월 %d일, 총 %d일간", absence_start.getOriginData().getYear(), absence_start.getOriginData().getMonth(), absence_start.getOriginData().getDay(), absence_end.getOriginData().getMonth(), absence_end.getOriginData().getDay(), absence_count_ToInt))
@@ -83,14 +100,19 @@ public class P_FirstPanel extends P_PanelParent {
 						.replace("$paname", parentName)
 						.replace("$teacher", teacher.getText())
 					);
-				System.out.println(builder.toString());
-				Util.showPrintPreview(builder, String.format("type:현장체험학습; number:%s; name:%s; abSdate:%s; abEdate:%s; date:%s; teacher:%s;",
-						number.getText(),
-						name.getText(),
-						absence_start.getText(),
-						absence_end.getText(),
-						String.format("%04d. %02d. %02d", c.get(Calendar.YEAR), c.get(Calendar.MONTH)+1, c.get(Calendar.DAY_OF_MONTH)),
-						teacher.getText()));
+				
+				builder[1] = new StringBuilder();
+				while((line = br.readLine()) != null)
+					builder[1].append(line);
+				
+				builder[2] = new StringBuilder();
+				while((line = br.readLine()) != null)
+					builder[2].append(line);
+				
+				builder[3] = new StringBuilder();
+				while((line = br.readLine()) != null)
+					builder[3].append(line);
+				System.out.println(builder[3].toString());
 			} catch(IOException e) {
 				e.printStackTrace(System.err);
 				return;
@@ -102,7 +124,77 @@ public class P_FirstPanel extends P_PanelParent {
 				if(fis != null)
 					try { fis.close(); } catch(IOException e) { e.printStackTrace(System.err); }
 			}
+			
+			try {
+				fis = new FileInputStream(lay1_LOCATION);
+				isr = new InputStreamReader(fis, "UTF-8");
+				br = new BufferedReader(isr);
+				
+				builder[1] = new StringBuilder();
+				while((line = br.readLine()) != null)
+					builder[1].append(line);
+			} catch(IOException e) {
+				e.printStackTrace(System.err);
+				return;
+			} finally {
+				if(br != null)
+					try { br.close(); } catch(IOException e) { e.printStackTrace(System.err); }
+				if(isr != null)
+					try { isr.close(); } catch(IOException e) { e.printStackTrace(System.err); }
+				if(fis != null)
+					try { fis.close(); } catch(IOException e) { e.printStackTrace(System.err); }
+			}
+			
+			try {
+				fis = new FileInputStream(lay2_LOCATION);
+				isr = new InputStreamReader(fis, "UTF-8");
+				br = new BufferedReader(isr);
+				
+				builder[2] = new StringBuilder();
+				while((line = br.readLine()) != null)
+					builder[2].append(line);
+			} catch(IOException e) {
+				e.printStackTrace(System.err);
+				return;
+			} finally {
+				if(br != null)
+					try { br.close(); } catch(IOException e) { e.printStackTrace(System.err); }
+				if(isr != null)
+					try { isr.close(); } catch(IOException e) { e.printStackTrace(System.err); }
+				if(fis != null)
+					try { fis.close(); } catch(IOException e) { e.printStackTrace(System.err); }
+			}
+			
+			try {
+				fis = new FileInputStream(lay3_LOCATION);
+				isr = new InputStreamReader(fis, "UTF-8");
+				br = new BufferedReader(isr);
+				
+				builder[3] = new StringBuilder();
+				while((line = br.readLine()) != null)
+					builder[3].append(line);
+			} catch(IOException e) {
+				e.printStackTrace(System.err);
+				return;
+			} finally {
+				if(br != null)
+					try { br.close(); } catch(IOException e) { e.printStackTrace(System.err); }
+				if(isr != null)
+					try { isr.close(); } catch(IOException e) { e.printStackTrace(System.err); }
+				if(fis != null)
+					try { fis.close(); } catch(IOException e) { e.printStackTrace(System.err); }
+			}
+			
+			Util.showPrintPreview(builder, String.format("type:현장체험학습; number:%s; name:%s; abSdate:%s; abEdate:%s; date:%s; teacher:%s;",
+					number.getText(),
+					name.getText(),
+					absence_start.getText(),
+					absence_end.getText(),
+					String.format("%04d. %02d. %02d", c.get(Calendar.YEAR), c.get(Calendar.MONTH)+1, c.get(Calendar.DAY_OF_MONTH)),
+					teacher.getText()));
 		}});
+		absence_start.setFocusable(false);
+		absence_end.setFocusable(false);
 		// </Setting>
 		
 		// <SettingLabel>

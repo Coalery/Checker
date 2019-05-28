@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
@@ -73,6 +74,8 @@ public class Util {
 		FileInputStream fis = null;
 		InputStreamReader isr = null;
 		BufferedReader br = null;
+		
+		Util.createDataFile();
 		
 		try {
 			fis = new FileInputStream("./data.hc");
@@ -338,36 +341,57 @@ public class Util {
 		}
 		return null;
 	}
-    
-	public static void showPrintPreview(StringBuilder builder, String logContent) {
-		JTextPane origin = new JTextPane();
-		origin.setContentType("text/html; charset=UTF-8");
-		origin.setText(builder.toString());
-		
+	
+	public static void showPrintPreview(StringBuilder[] builder, String logContent) {
 		JDialog preview = new JDialog();
 		preview.setModal(true);
 		preview.setSize(700, 600);
 		preview.setLayout(new BorderLayout());
 		preview.setTitle("인쇄 미리보기");
 		
-		HashPrintRequestAttributeSet set = new HashPrintRequestAttributeSet();
-		set.add(MediaSizeName.ISO_A4);
-		set.add(OrientationRequested.PORTRAIT);
-		PageFormat pf = PrinterJob.getPrinterJob().getPageFormat(set);
+		final E_PrintPreview[] _previews = new E_PrintPreview[builder.length];
+		final JPanel centerPanel = new JPanel();
+		final CardLayout card = new CardLayout();
+		centerPanel.setLayout(card);
 		
-		final E_PrintPreview _preview = new E_PrintPreview(origin.getPrintable(null, null), pf);
+		for(int i=0; i<_previews.length; i++) {
+			JTextPane origin = new JTextPane();
+			origin.setContentType("text/html; charset=UTF-8");
+			origin.setText(builder[i].toString());
+			
+			HashPrintRequestAttributeSet set = new HashPrintRequestAttributeSet();
+			set.add(MediaSizeName.ISO_A4);
+			set.add(OrientationRequested.PORTRAIT);
+			PageFormat pf = PrinterJob.getPrinterJob().getPageFormat(set);
+			
+			_previews[i] = new E_PrintPreview(origin.getPrintable(null, null), pf);
+			centerPanel.add(String.valueOf(i), _previews[i]);
+		}
 		
-		JButton printButton = new JButton("인쇄");
+		JButton printButton = (JButton)Util.getDefaultComponent(new JButton("인쇄"), Color.WHITE, true);
 		printButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
-			_preview.print();
+			for(int i=0; i<_previews.length; i++)
+				_previews[i].print();
 			Util.log(logContent);
 		}});
 		
+		JButton previous = (JButton) Util.getDefaultComponent(new JButton("<<"), Color.WHITE, true);
+		previous.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
+			card.previous(centerPanel);
+		}});
+		
+		JButton next = (JButton) Util.getDefaultComponent(new JButton(">>"), Color.WHITE, true);
+		next.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
+			card.next(centerPanel);
+		}});
+		
 		JPanel buttonsPanel = new JPanel();
+		buttonsPanel.add(previous);
+		buttonsPanel.add(next);
 		buttonsPanel.add(printButton);
 		
-		preview.getContentPane().add(_preview, BorderLayout.CENTER);
-		preview.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
+		preview.getContentPane().add(centerPanel, "Center");
+		preview.getContentPane().add(buttonsPanel, "South");
 		
 		preview.setResizable(false);
 		preview.setVisible(true);

@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -15,11 +16,10 @@ import javax.swing.JTextField;
 @SuppressWarnings("serial")
 public class D_OptionDialog extends JDialog {
 	
-	private final int LAYOUT_PANEL_OPTION_COUNT = 10;
+	private final int LAYOUT_PANEL_OPTION_COUNT = 6;
 	private final int OPTION_PANEL_COUNT = 2;
 	
 	private JPanel[] optionPanels;
-//	private int selectIndex;
 	
 	public D_OptionDialog(JFrame owner, boolean visible) {
 		super(owner, "옵션", true);
@@ -35,6 +35,7 @@ public class D_OptionDialog extends JDialog {
 		// <SelectOptionPanel>
 		JPanel selectOptionPanel = new JPanel();
 		selectOptionPanel.setLayout(new GridLayout(10, 1));
+		selectOptionPanel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, new Color(220, 220, 220)));
 		
 		JButton[] selects = new JButton[OPTION_PANEL_COUNT];
 		String[] names = {"일반", "서식 파일"};
@@ -52,15 +53,14 @@ public class D_OptionDialog extends JDialog {
 		selectOptionPanel.setLocation(0, 0);
 		// </SelectOptionPanel>
 		
-		// <LayoutPathPanel>
-		optionPanels[0] = new JPanel();
-		optionPanels[0].setSize(524, 272);
-		optionPanels[0].setLocation(100, 0);
-		
-		optionPanels[1] = new JPanel();
-		optionPanels[1].setSize(524, 272);
-		optionPanels[1].setLocation(100, 0);
-		// </LayoutPathPanel>
+		// <OptionPanelAll>
+		for(int i=0; i<optionPanels.length; i++) {
+			optionPanels[i] = new JPanel();
+			optionPanels[i].setSize(524, 272);
+			optionPanels[i].setLocation(100, 0);
+			optionPanels[i].setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
+		}
+		// </OptionPanelAll>
 		
 		// <OptionPanel_0>
 		
@@ -69,37 +69,78 @@ public class D_OptionDialog extends JDialog {
 		// <optionPanel_1>
 		optionPanels[1].setLayout(null);
 		
-		JLabel[] labels = new JLabel[LAYOUT_PANEL_OPTION_COUNT];
-		JTextField[] locFields = new JTextField[LAYOUT_PANEL_OPTION_COUNT];
-		String[] labelName = {"결석계", "학습 계획서", "학부모 동의서", "학습 결과 보고서", "lay4", "lay5", "lay6", "lay7", "lay8", "lay9"};
+		JPanel[] structs = new JPanel[LAYOUT_PANEL_OPTION_COUNT];
+		String[] labelName = {"결석계", "학습 계획서", "학부모 동의서", "학습 결과 보고서", "결석계", "출결 인정 확인서"};
 		
 		for(int i=0; i<LAYOUT_PANEL_OPTION_COUNT; i++) {
-			labels[i] = new JLabel(labelName[i]);
-			labels[i].setSize(140, 20);
-			labels[i].setLocation(30, 10 + 25*i);
+			structs[i] = new JPanel();
+			structs[i].setLayout(null);
+			structs[i].setSize(500, 20);
 			
-			locFields[i] = new JTextField();
-			locFields[i].setSize(250, 20);
-			locFields[i].setLocation(150, 10 + 25*i);
-			locFields[i].setEditable(false);
+			JLabel label = new JLabel(labelName[i]);
+			label.setSize(140, 20);
+			label.setLocation(0, 0);
+			
+			JTextField locField = new JTextField();
+			locField.setSize(250, 20);
+			locField.setLocation(150, 0);
+			locField.setEditable(false);
 			
 			String path = Util.getConfig("lay" + i + "_LOCATION");
 			if(path != null)
-				locFields[i].setText(path);
+				locField.setText(path);
 			
 			JButton button = new JButton("찾기");
 			button.setSize(60, 20);
-			button.setLocation(430, 10 + 25*i);
+			button.setLocation(420, 0);
 			
 			button.setFocusPainted(false);
 			button.setOpaque(true);
 			button.setBackground(Color.WHITE);
-			button.addActionListener(new LO_Listener("lay" + i, locFields[i]));
+			button.addActionListener(new LO_Listener("lay" + i, locField));
 			
-			optionPanels[1].add(labels[i]);
-			optionPanels[1].add(locFields[i]);
-			optionPanels[1].add(button);
+			structs[i].add(label);
+			structs[i].add(locField);
+			structs[i].add(button);
 		}
+		
+		JPanel firstOption = new JPanel();
+		firstOption.setLayout(null);
+		firstOption.setBorder(BorderFactory.createTitledBorder("현장체험"));
+		firstOption.setSize(515, 110);
+		firstOption.setLocation(5, 5);
+		
+		for(int i=0; i<4; i++) {
+			structs[i].setSize(490, 20);
+			structs[i].setLocation(17, 15 + i*22);
+			firstOption.add(structs[i]);
+		}
+		optionPanels[1].add(firstOption);
+		
+		JPanel secondOption = new JPanel();
+		secondOption.setLayout(null);
+		secondOption.setBorder(BorderFactory.createTitledBorder("결석"));
+		secondOption.setSize(515, 43);
+		secondOption.setLocation(5, 124);
+		
+		structs[4].setSize(490, 20);
+		structs[4].setLocation(17, 15);
+		secondOption.add(structs[4]);
+		
+		optionPanels[1].add(secondOption);
+		
+		JPanel thirdOption = new JPanel();
+		thirdOption.setLayout(null);
+		thirdOption.setBorder(BorderFactory.createTitledBorder("조퇴·결과·지각"));
+		thirdOption.setSize(515, 43);
+		thirdOption.setLocation(5, 181);
+		
+		structs[5].setSize(490, 20);
+		structs[5].setLocation(17, 15);
+		thirdOption.add(structs[5]);
+		
+		optionPanels[1].add(thirdOption);
+		
 		// </optionPanel_1>
 		optionPanels[0].setVisible(true);
 		optionPanels[1].setVisible(false);
