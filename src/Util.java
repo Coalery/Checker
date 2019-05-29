@@ -184,6 +184,10 @@ public class Util {
 			if(br.ready()) {
 				String line;
 				while((line = br.readLine()) != null) {
+					if(line.length() == 0)
+						continue;
+					if(line.charAt(0) == 0xFEFF)
+						line = line.substring(1);
 					if(line.split("=")[0].equals(key)) {
 						value = line.split("=")[1];
 						break;

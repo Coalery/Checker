@@ -63,7 +63,14 @@ public class D_OptionDialog extends JDialog {
 		// </OptionPanelAll>
 		
 		// <OptionPanel_0>
+		optionPanels[0].setLayout(null);
 		
+		JLabel working = new JLabel("< 공사중 >");
+		
+		working.setSize(60, 20);
+		working.setLocation(232, 126);
+		
+		optionPanels[0].add(working);
 		// </OptionPanel_0>
 		
 		// <optionPanel_1>

@@ -18,6 +18,8 @@ public class P_PanelParent extends JPanel {
 	protected JTextField name;
 	protected JButton print;
 	protected String parentName;
+	protected JLabel teacher_L;
+	protected JLabel teacher;
 	
 	public P_PanelParent() {
 		// <DefaultSetting>
@@ -33,6 +35,9 @@ public class P_PanelParent extends JPanel {
 		name = new JTextField();
 		
 		print = (JButton) Util.getDefaultComponent(new JButton("인쇄"), new Color(200, 200, 200), true);
+		
+		teacher_L = new JLabel("선생님 : ");
+		teacher = new JLabel(Util.getConfig("teacher"));
 		// </Define>
 		
 		// <Setting>

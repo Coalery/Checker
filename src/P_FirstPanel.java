@@ -37,9 +37,6 @@ public class P_FirstPanel extends P_PanelParent {
 		
 		JLabel absence_count_L = new JLabel("일간");
 		absence_count = new JTextField();
-		
-		JLabel teacher_L = new JLabel("선생님 : ");
-		JLabel teacher = new JLabel(Util.getConfig("teacher"));
 		// </Define>
 		
 		// <Setting>
@@ -100,19 +97,6 @@ public class P_FirstPanel extends P_PanelParent {
 						.replace("$paname", parentName)
 						.replace("$teacher", teacher.getText())
 					);
-				
-				builder[1] = new StringBuilder();
-				while((line = br.readLine()) != null)
-					builder[1].append(line);
-				
-				builder[2] = new StringBuilder();
-				while((line = br.readLine()) != null)
-					builder[2].append(line);
-				
-				builder[3] = new StringBuilder();
-				while((line = br.readLine()) != null)
-					builder[3].append(line);
-				System.out.println(builder[3].toString());
 			} catch(IOException e) {
 				e.printStackTrace(System.err);
 				return;

@@ -120,7 +120,7 @@ public class F_StartFrame extends JFrame {
 		
 		firstP = new P_FirstPanel(F_StartFrame.this);
 		secondP = new P_SecondPanel(F_StartFrame.this);
-		thirdP = new P_ThirdPanel();
+		thirdP = new P_ThirdPanel(F_StartFrame.this);
 		
 		centerPanel.add("First", firstP);
 		centerPanel.add("Second", secondP);
