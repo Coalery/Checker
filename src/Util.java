@@ -1,10 +1,15 @@
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FileDialog;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -31,6 +36,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 public class Util {
 	
@@ -115,100 +123,116 @@ public class Util {
 		
 		return result;
 	}
+
 	
+	@SuppressWarnings("unchecked")
 	public static void changeConfig(String key, String value) {
+		BufferedReader br = null;
 		BufferedWriter bw = null;
 		
-		System.out.println("key: " + key + ", value: " + value);
-		
 		try {
-			String config = getConfig(key);
-			if(config == null) {
-				bw = new BufferedWriter(new FileWriter("./config.hc", true));
-				bw.newLine();
-				bw.append(key + "=" + value);
+			String json = "";
+			File f = new File("config.hc");
+			if(!f.exists()) {
+				f.createNewFile();
+				json = "{}";
 			} else {
-				FileReader fr = null;
-				BufferedReader br = null;
-				
-				String res = null;
-				
-				try {
-					fr = new FileReader("./config.hc");
-					br = new BufferedReader(fr);
-					
-					StringBuilder sb = new StringBuilder();
-					String line;
-					while((line = br.readLine()) != null)
-						sb.append(line + "\n");
-					
-					res = sb.toString();
-					if(res.charAt(res.length()-1) == '\n')
-						res = res.substring(0, res.length()-1);
-				} catch (IOException e) {
-					e.printStackTrace(System.err);
-				} finally {
-					if(br != null)
-						try { br.close(); } catch (IOException e) {e.printStackTrace(System.err);}
-					if(fr != null)
-						try { fr.close(); } catch (IOException e) {e.printStackTrace(System.err);}
-				}
-				bw = new BufferedWriter(new FileWriter("./config.hc"));
-				bw.write(res.replace(config, value));
-			}
-			
-		} catch (IOException e) {
-			e.printStackTrace(System.err);
-		} finally {
-			if(bw != null)
-				try { bw.close(); } catch (IOException e) { e.printStackTrace(System.err); }
-		}
-	}
-	
-	/**"config.hc" 파일에서 값을 가져온다. (K-V)<br>
-	 * 매개변수로 받은 Key 값이 존재하지 않을 경우, null 을 리턴한다.
-	 * 
-	 * @author Coalery ( 김현우 )
-	 * @param key : 받아올 데이터의 Key 값
-	 * @return Key 값에 의해 불러온 Value
-	 */
-	public static String getConfig(String key) {
-		String value = null;
-		FileReader fr = null;
-		BufferedReader br = null;
-		
-		try {
-			fr = new FileReader("./config.hc");
-			br = new BufferedReader(fr);
-			
-			if(br.ready()) {
+				br = new BufferedReader(new FileReader("config.hc"));
 				String line;
 				while((line = br.readLine()) != null) {
-					if(line.length() == 0)
-						continue;
-					if(line.charAt(0) == 0xFEFF)
+					if(line.charAt(0) == 65279)
 						line = line.substring(1);
-					if(line.split("=")[0].equals(key)) {
-						value = line.split("=")[1];
-						break;
-					}
+					json += line;
 				}
+				try { br.close(); } catch (IOException e) {e.printStackTrace(System.err);}
 			}
+			
+			JSONParser parser = new JSONParser();
+			JSONObject object = (JSONObject)parser.parse(json);
+			object.put(key, value);
+			
+			bw = new BufferedWriter(new FileWriter("config.hc"));
+			String s = object.toJSONString();
+			bw.write(s);
+			
+			try { bw.close(); } catch (IOException e) {e.printStackTrace(System.err);}
+			
+			
+		} catch (org.json.simple.parser.ParseException e) {
+			e.printStackTrace(System.err);
 		} catch (IOException e) {
 			e.printStackTrace(System.err);
 		} finally {
 			if(br != null)
 				try { br.close(); } catch (IOException e) {e.printStackTrace(System.err);}
-			if(fr != null)
-				try { fr.close(); } catch (IOException e) {e.printStackTrace(System.err);}
+			if(bw != null)
+				try { bw.close(); } catch (IOException e) {e.printStackTrace(System.err);}
 		}
+	}
+	
+	public static String getConfig(String key) {
+		BufferedReader br = null;
 		
-		return value;
+		try {
+			String json = "";
+			File f = new File("config.hc");
+			if(!f.exists()) {
+				return null;
+			} else {
+				br = new BufferedReader(new FileReader("config.hc"));
+				String line;
+				while((line = br.readLine()) != null) {
+					if(line.charAt(0) == 65279)
+						line = line.substring(1);
+					json += line;
+				}
+				try { br.close(); } catch (IOException e) {e.printStackTrace(System.err);}
+			}
+			
+			JSONParser parser = new JSONParser();
+			JSONObject object = (JSONObject)parser.parse(json);
+			return (String)object.get(key);
+		} catch (org.json.simple.parser.ParseException e) {
+			e.printStackTrace(System.err);
+		} catch (IOException e) {
+			e.printStackTrace(System.err);
+		} finally {
+			if(br != null)
+				try { br.close(); } catch (IOException e) {e.printStackTrace(System.err);}
+		}
+		return null;
+	}
+	
+	/**매개변수로 받은 레이아웃을 출력한다.
+	 * @author Coalery ( 김현우 )
+	 * @param title Printing job name
+	 * @param layout 출력할 레이아웃
+	 */
+	public static void printComponent(String title, Component component) {
+		PrinterJob pj = PrinterJob.getPrinterJob();
+		pj.setJobName(title);
+		
+		pj.setPrintable(new Printable() {
+			public int print(Graphics pg, PageFormat pf, int pageNum) {
+				if(pageNum > 0) {
+					return Printable.NO_SUCH_PAGE;
+				}
+				
+				Graphics2D g2 = (Graphics2D) pg;
+				g2.translate(pf.getImageableX(), pf.getImageableY());
+				
+				component.paint(g2);
+				return Printable.PAGE_EXISTS;
+			}
+		});
+		if(!pj.printDialog())
+			return;
+		try { pj.print(); } catch(PrinterException e) { e.printStackTrace(); }
 	}
 	
 	/**"log.hc" 파일에 로그를 기록한다.
 	 * @author Coalery ( 김현우 )
-	 * @param content : 로그에 입력할 기록 내용
+	 * @param content 로그에 입력할 기록 내용
 	 */
 	public static void log(String content) {
 		Calendar c = Calendar.getInstance();
@@ -311,10 +335,10 @@ public class Util {
 	
 	/**매개변수로 넣은 컴포넌트에 여러가지 서식을 입힙니다. JButton, JMenuItem, JToggleButton 만 사용 가능합니다.
 	 * @author Coalery ( 김현우 )
-	 * @param button : 서식을 적용할 컴포넌트
+	 * @param component : 서식을 적용할 컴포넌트
 	 * @param c : 컴포넌트에 입힐 색깔
 	 * @param isBorderPainted : 컴포넌트의 외곽선 여부
-	 * @return 서식을 모두 적용한 컴포넌트를 리턴한다. 맞지 않는 컴포넌트인 경우 null 을 반환합니다.
+	 * @return 서식을 모두 적용한 컴포넌트를 리턴한다. 맞지 않는 컴포넌트인 경우 null 을 반환한다.
 	 * @see javax.swing.AbstractButton
 	 * @see javax.swing.JButton
 	 * @see javax.swing.JMenuItem
@@ -346,6 +370,20 @@ public class Util {
 		return null;
 	}
 	
+	/**선생님의 성함을 입력 받고, 저장하는 Dialog 를 띄웁니다.
+	 * @author Coalery ( 김현우 )
+	 * @see javax.swing.JOptionPane
+	 */
+	public static void teacherNameDialog() {
+		String teacherName = JOptionPane.showInputDialog("이 프로그램을 사용하시는 선생님의 성함을 입력해주세요.\n* 초기 한번만 하면 됩니다.\n* 입력하지 않으시면 프로그램 가동이 불가능합니다.");
+		if(teacherName == null)
+			System.exit(0);
+		if(teacherName.equals(""))
+			System.exit(0);
+		Util.changeConfig("teacher", teacherName);
+	}
+	
+	@Deprecated
 	public static void showPrintPreview(StringBuilder[] builder, String logContent) {
 		JDialog preview = new JDialog();
 		preview.setModal(true);
@@ -376,7 +414,7 @@ public class Util {
 		printButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
 			for(int i=0; i<_previews.length; i++)
 				_previews[i].print();
-			Util.log(logContent);
+			
 		}});
 		
 		JButton previous = (JButton) Util.getDefaultComponent(new JButton("<<"), Color.WHITE, true);

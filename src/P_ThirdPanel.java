@@ -1,11 +1,6 @@
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Calendar;
 
 import javax.swing.JCheckBox;
@@ -74,69 +69,24 @@ public class P_ThirdPanel extends P_PanelParent {
 				Util.showMessage("아직 입력하지 않은 정보가 있습니다.", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+			int numberN = -1;
+			try { numberN = Integer.parseInt(number.getText()); } catch(NumberFormatException e ) {
+				Util.showMessage("학번이 숫자가 아닙니다.", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			
-			FileInputStream fis = null;
-			InputStreamReader isr = null;
-			BufferedReader br = null;
-			
-			String lay5_LOCATION = Util.getConfig("lay5_LOCATION");
-			
-			StringBuilder[] builder = new StringBuilder[1];
 			Calendar c = Calendar.getInstance();
-			String line;
+			StringBuilder period = new StringBuilder();
+			for(int i=0; i<range.length; i++)
+				if(range[i].isSelected())
+					period.append((i+1) + "교시, ");
+			String res = period.toString();
+			if(res.length() != 0)
+				res = res.substring(0, res.length() - 2);
 			
-			if(lay5_LOCATION == null) {
-				Util.showMessage("이 문서를 출력하기 위한 서식 파일 중 지정이 되지 않은 것이 있습니다.\n옵션에 들어가서 서식 파일의 경로를 지정해주세요.", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			if(!new File(lay5_LOCATION).exists()) {
-				Util.showMessage("해당 경로에 서식 파일이 존재하지 않습니다.\n옵션에 들어가서 서식 파일의 경로를 확인해주세요.", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			
-			try {
-				fis = new FileInputStream(lay5_LOCATION);
-				isr = new InputStreamReader(fis, "UTF-8");
-				br = new BufferedReader(isr);
-				
-				StringBuilder period = new StringBuilder();
-				for(int i=0; i<range.length; i++)
-					if(range[i].isSelected())
-						period.append((i+1) + "교시, ");
-				String res = period.toString();
-				if(res.length() != 0)
-					res = res.substring(0, res.length() - 2);
-				
-				builder[0] = new StringBuilder();
-				while((line = br.readLine()) != null)
-					builder[0].append(line
-						.replace("$number", number.getText())
-						.replace("$name", name.getText())
-						.replace("$reason", reason.getText())
-						.replace("$absc.year", absence.getOriginData().getYear() + "")
-						.replace("$absc.month", absence.getOriginData().getMonth() + "")
-						.replace("$absc.day", absence.getOriginData().getDay() + "")
-						.replace("$absc.period", res)
-						.replace("$year", c.get(Calendar.YEAR) + "")
-						.replace("$month", (c.get(Calendar.MONTH) + 1) + "")
-						.replace("$day", c.get(Calendar.DAY_OF_MONTH) + "")
-						.replace("$abmethod", (String) range_method.getSelectedItem())
-						.replace("$teacher", teacher.getText())
-					);
-			} catch(IOException e) {
-				e.printStackTrace(System.err);
-				return;
-			} finally {
-				if(br != null)
-					try { br.close(); } catch(IOException e) { e.printStackTrace(System.err); }
-				if(isr != null)
-					try { isr.close(); } catch(IOException e) { e.printStackTrace(System.err); }
-				if(fis != null)
-					try { fis.close(); } catch(IOException e) { e.printStackTrace(System.err); }
-			}
-			
-			// TODO
-			Util.showPrintPreview(builder, String.format("type:조퇴·결과·지각; number:%s; name:%s; date:%s; teacher:%s;",
+			E_Calendar cData = absence.getOriginData();
+			Util.printComponent("Layout3_1", new L_Layout3_1(numberN, name.getText(), reason.getText(), cData.getYear(), cData.getMonth(), cData.getDay(), res, c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), (String)range_method.getSelectedItem(), teacher.getText()));
+			Util.log(String.format("type:조퇴·결과·지각; number:%s; name:%s; date:%s; teacher:%s;",
 					number.getText(),
 					name.getText(),
 					String.format("%04d. %02d. %02d", c.get(Calendar.YEAR), c.get(Calendar.MONTH)+1, c.get(Calendar.DAY_OF_MONTH)),

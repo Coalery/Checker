@@ -6,9 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 
@@ -17,7 +15,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
@@ -41,30 +38,10 @@ public class F_StartFrame extends JFrame {
 		try {System.setErr(new PrintStream("./err.hc"));} catch (IOException e) {e.printStackTrace();}
 		addWindowListener(new WindowAdapter() {public void windowClosing(WindowEvent e) {System.exit(0);}});
 		
-		if(!(new File("./config.hc").exists())) {
-			String teacherName = JOptionPane.showInputDialog("이 프로그램을 사용하시는 선생님의 성함을 입력해주세요.\n* 초기 한번만 하면 됩니다.\n* 입력하지 않으시면 프로그램 가동이 불가능합니다.");
-			if(teacherName == null)
-				System.exit(0);
-			if(teacherName.equals(""))
-				System.exit(0);
-			
-			FileWriter fw = null;
-			BufferedWriter bw = null;
-			
-			try {
-				fw = new FileWriter("./config.hc");
-				bw = new BufferedWriter(fw);
-				
-				bw.write("teacher=" + teacherName);
-			} catch(IOException e) {
-				e.printStackTrace(System.err);
-			} finally {
-				if(bw != null)
-					try {bw.close();} catch(IOException e) {e.printStackTrace(System.err);}
-				if(fw != null)
-					try {fw.close();} catch(IOException e) {e.printStackTrace(System.err);}
-			}
-		}
+		if(!(new File("./config.hc").exists()))
+			Util.teacherNameDialog();
+		if(Util.getConfig("teacher") == null)
+			Util.teacherNameDialog();
 		
 		// <Menu>
 		JMenuBar menubar = new JMenuBar();

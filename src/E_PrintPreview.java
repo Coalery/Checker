@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 
+@Deprecated
 @SuppressWarnings("serial")
 public class E_PrintPreview extends JScrollPane {
 	private Printable pr;

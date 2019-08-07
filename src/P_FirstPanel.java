@@ -169,7 +169,11 @@ public class P_FirstPanel extends P_PanelParent {
 					try { fis.close(); } catch(IOException e) { e.printStackTrace(System.err); }
 			}
 			
-			Util.showPrintPreview(builder, String.format("type:현장체험학습; number:%s; name:%s; abSdate:%s; abEdate:%s; date:%s; teacher:%s;",
+			Util.printComponent("Layout1_1", new L_Layout1_1(20613, "김현우"));
+			Util.printComponent("Layout1_2", new L_Layout1_2(20613, "김현우"));
+			Util.printComponent("Layout1_3", new L_Layout1_3(20613, "김현우"));
+			Util.printComponent("Layout1_4", new L_Layout1_4(20613, "김현우"));
+			Util.log(String.format("type:현장체험학습; number:%s; name:%s; abSdate:%s; abEdate:%s; date:%s; teacher:%s;",
 					number.getText(),
 					name.getText(),
 					absence_start.getText(),

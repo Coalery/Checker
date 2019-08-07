@@ -133,7 +133,8 @@ public class P_SecondPanel extends P_PanelParent {
 					try { fis.close(); } catch(IOException e) { e.printStackTrace(System.err); }
 			}
 			
-			Util.showPrintPreview(builder, String.format("type:결석; number:%s; name:%s; abSdate:%s; abEdate:%s; date:%s; teacher:%s;",
+			Util.printComponent("Layout2_1", new L_Layout2_1(20613, "김현우"));
+			Util.log(String.format("type:결석; number:%s; name:%s; abSdate:%s; abEdate:%s; date:%s; teacher:%s;",
 					number.getText(),
 					name.getText(),
 					absence_start.getText(),
