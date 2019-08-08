@@ -1,46 +1,31 @@
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.FileDialog;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.print.PageFormat;
-import java.awt.print.Printable;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Calendar;
 
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.standard.MediaSizeName;
-import javax.print.attribute.standard.OrientationRequested;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 public class Util {
+	
+	public static final int A4_WIDTH = 210;
+	public static final int A4_HEIGHT = 297;
+	
+	public static final float A4_WEIGHT = 2.74f;
 	
 	public static void createDataFile() {
 		File dataFile = new File("./data.hc");
@@ -137,7 +122,7 @@ public class Util {
 				f.createNewFile();
 				json = "{}";
 			} else {
-				br = new BufferedReader(new FileReader("config.hc"));
+				br = new BufferedReader(new InputStreamReader(new FileInputStream("config.hc"), "UTF8"));
 				String line;
 				while((line = br.readLine()) != null) {
 					if(line.charAt(0) == 65279)
@@ -151,7 +136,7 @@ public class Util {
 			JSONObject object = (JSONObject)parser.parse(json);
 			object.put(key, value);
 			
-			bw = new BufferedWriter(new FileWriter("config.hc"));
+			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("config.hc"), "UTF8"));
 			String s = object.toJSONString();
 			bw.write(s);
 			
@@ -179,7 +164,7 @@ public class Util {
 			if(!f.exists()) {
 				return null;
 			} else {
-				br = new BufferedReader(new FileReader("config.hc"));
+				br = new BufferedReader(new InputStreamReader(new FileInputStream("config.hc"), "UTF8"));
 				String line;
 				while((line = br.readLine()) != null) {
 					if(line.charAt(0) == 65279)
@@ -201,60 +186,6 @@ public class Util {
 				try { br.close(); } catch (IOException e) {e.printStackTrace(System.err);}
 		}
 		return null;
-	}
-	
-	/**매개변수로 받은 레이아웃을 출력한다.
-	 * @author Coalery ( 김현우 )
-	 * @param title Printing job name
-	 * @param layout 출력할 레이아웃
-	 */
-	public static void printComponent(String title, Component component) {
-		PrinterJob pj = PrinterJob.getPrinterJob();
-		pj.setJobName(title);
-		
-		pj.setPrintable(new Printable() {
-			public int print(Graphics pg, PageFormat pf, int pageNum) {
-				if(pageNum > 0) {
-					return Printable.NO_SUCH_PAGE;
-				}
-				
-				Graphics2D g2 = (Graphics2D) pg;
-				g2.translate(pf.getImageableX(), pf.getImageableY());
-				
-				component.paint(g2);
-				return Printable.PAGE_EXISTS;
-			}
-		});
-		if(!pj.printDialog())
-			return;
-		try { pj.print(); } catch(PrinterException e) { e.printStackTrace(); }
-	}
-	
-	/**"log.hc" 파일에 로그를 기록한다.
-	 * @author Coalery ( 김현우 )
-	 * @param content 로그에 입력할 기록 내용
-	 */
-	public static void log(String content) {
-		Calendar c = Calendar.getInstance();
-		String s = String.format("[%04d-%02d-%02d/%02d:%02d:%02d.%03d] %s%n", c.get(Calendar.YEAR), (c.get(Calendar.MONTH)+1), c.get(Calendar.DAY_OF_MONTH), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c.get(Calendar.SECOND), c.get(Calendar.MILLISECOND), content);
-		
-		FileWriter fw = null;
-		BufferedWriter bw = null;
-		
-		try {
-			File f = new File("./log.hc");
-			fw = new FileWriter(f, f.exists());
-			bw = new BufferedWriter(fw);
-			
-			bw.write(s);
-		} catch(IOException e) {
-			e.printStackTrace(System.err);
-		} finally {
-			if(bw != null)
-				try { bw.close(); } catch (IOException e) {e.printStackTrace(System.err);}
-			if(fw != null)
-				try { fw.close(); } catch (IOException e) {e.printStackTrace(System.err);}
-		}
 	}
 	
 	/**JOptionPane 의 showMessageDialog 를 통해 간단히 메세지를 보여준다.
@@ -382,61 +313,4 @@ public class Util {
 			System.exit(0);
 		Util.changeConfig("teacher", teacherName);
 	}
-	
-	@Deprecated
-	public static void showPrintPreview(StringBuilder[] builder, String logContent) {
-		JDialog preview = new JDialog();
-		preview.setModal(true);
-		preview.setSize(700, 600);
-		preview.setLayout(new BorderLayout());
-		preview.setTitle("인쇄 미리보기");
-		
-		final E_PrintPreview[] _previews = new E_PrintPreview[builder.length];
-		final JPanel centerPanel = new JPanel();
-		final CardLayout card = new CardLayout();
-		centerPanel.setLayout(card);
-		
-		for(int i=0; i<_previews.length; i++) {
-			JTextPane origin = new JTextPane();
-			origin.setContentType("text/html; charset=UTF-8");
-			origin.setText(builder[i].toString());
-			
-			HashPrintRequestAttributeSet set = new HashPrintRequestAttributeSet();
-			set.add(MediaSizeName.ISO_A4);
-			set.add(OrientationRequested.PORTRAIT);
-			PageFormat pf = PrinterJob.getPrinterJob().getPageFormat(set);
-			
-			_previews[i] = new E_PrintPreview(origin.getPrintable(null, null), pf);
-			centerPanel.add(String.valueOf(i), _previews[i]);
-		}
-		
-		JButton printButton = (JButton)Util.getDefaultComponent(new JButton("인쇄"), Color.WHITE, true);
-		printButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
-			for(int i=0; i<_previews.length; i++)
-				_previews[i].print();
-			
-		}});
-		
-		JButton previous = (JButton) Util.getDefaultComponent(new JButton("<<"), Color.WHITE, true);
-		previous.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
-			card.previous(centerPanel);
-		}});
-		
-		JButton next = (JButton) Util.getDefaultComponent(new JButton(">>"), Color.WHITE, true);
-		next.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
-			card.next(centerPanel);
-		}});
-		
-		JPanel buttonsPanel = new JPanel();
-		buttonsPanel.add(previous);
-		buttonsPanel.add(next);
-		buttonsPanel.add(printButton);
-		
-		preview.getContentPane().add(centerPanel, "Center");
-		preview.getContentPane().add(buttonsPanel, "South");
-		
-		preview.setResizable(false);
-		preview.setVisible(true);
-	}
-	
 }

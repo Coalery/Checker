@@ -14,27 +14,21 @@ public class L_Layout1_1 extends JPanel {
 	
 	// A4 Size  210 : 297
 	
-	public static final int A4_WIDTH = 210;
-	public static final int A4_HEIGHT = 297;
-	
-	public static final float A4_WEIGHT = 2.74f;
-	
-	public L_Layout1_1(int number, String name) {
+	public L_Layout1_1(int number, String name, int asYear, int asMonth, int asDay, int adMonth, int adDay, int aDays, int year, int month, int day, String parentName, String teacher) {
 		setLayout(null);
 		setBackground(Color.WHITE);
-		setSize((int)(L_Layout1_1.A4_WIDTH * L_Layout1_1.A4_WEIGHT), (int)(L_Layout1_1.A4_HEIGHT * L_Layout1_1.A4_WEIGHT));
 		
 		JPanel outsideDotBorder = new JPanel();
 		outsideDotBorder.setBorder(new DashedBorder());
-		outsideDotBorder.setSize((int)(180 * A4_WEIGHT), (int)(247 * A4_WEIGHT));
-		outsideDotBorder.setLocation((int)(15 * A4_WEIGHT), (int)(25 * A4_WEIGHT));
+		outsideDotBorder.setSize((int)(180 * Util.A4_WEIGHT), (int)(247 * Util.A4_WEIGHT));
+		outsideDotBorder.setLocation((int)(15 * Util.A4_WEIGHT), (int)(25 * Util.A4_WEIGHT));
 		outsideDotBorder.setBackground(Color.WHITE);
 		outsideDotBorder.setOpaque(false);
 		
 		JLabel titleL = new JLabel("결       석       계", JLabel.CENTER);
 		titleL.setFont(new Font("함초롬돋움", Font.BOLD, 30));
 		titleL.setSize(300, 100);
-		titleL.setLocation((int)(L_Layout1_1.A4_WIDTH * L_Layout1_1.A4_WEIGHT / 2) - 150, 80);
+		titleL.setLocation((int)(Util.A4_WIDTH * Util.A4_WEIGHT / 2) - 150, 80);
 		
 		JLabel numberL = new JLabel("학  번  :  " + number);
 		numberL.setFont(new Font("함초롬돋움", Font.PLAIN, 12));
@@ -56,25 +50,25 @@ public class L_Layout1_1 extends JPanel {
 		content2L.setSize(380, 20);
 		content2L.setLocation(85, 253);
 		
-		JLabel content3L = new JLabel("2.  결석  기간  :    2019년      월      일  ~      월      일 (총     일간)");
+		JLabel content3L = new JLabel("2.  결석  기간  :    " + asYear + "년   " + asMonth + "월   " + asDay + "일  ~   " + adMonth + "월   " + adDay + "일 (총  " + aDays + " 일간)");
 		content3L.setFont(new Font("함초롬바탕", Font.PLAIN, 12));
-		content3L.setSize(380, 20);
+		content3L.setSize(420, 20);
 		content3L.setLocation(85, 278);
 		
-		JLabel content4L = new JLabel("2019년    월          일", JLabel.CENTER);
+		JLabel content4L = new JLabel(year + "년   " + month + "월     " + day + "일", JLabel.CENTER);
 		content4L.setFont(new Font("함초롬바탕", Font.PLAIN, 12));
 		content4L.setSize(200, 20);
-		content4L.setLocation((int)(L_Layout1_1.A4_WIDTH * L_Layout1_1.A4_WEIGHT / 2) - 100, 360);
+		content4L.setLocation((int)(Util.A4_WIDTH * Util.A4_WEIGHT / 2) - 100, 360);
 		
-		JLabel content5L = new JLabel("보호자(학생과  관계:  모  )                       (인)");
+		JLabel content5L = new JLabel("보호자(학생과  관계:  모  )            " + parentName + "      (인)");
 		content5L.setFont(new Font("함초롬바탕", Font.PLAIN, 12));
 		content5L.setSize(300, 20);
 		content5L.setLocation(213, 400);
 		
 		JPanel insideDotBorder = new JPanel();
 		insideDotBorder.setBorder(new DashedBorder());
-		insideDotBorder.setSize((int)(154 * A4_WEIGHT), (int)(83.2 * A4_WEIGHT));
-		insideDotBorder.setLocation((int)(L_Layout1_1.A4_WIDTH * L_Layout1_1.A4_WEIGHT / 2) - (int)(154 * A4_WEIGHT / 2), 445);
+		insideDotBorder.setSize((int)(154 * Util.A4_WEIGHT), (int)(83.2 * Util.A4_WEIGHT));
+		insideDotBorder.setLocation((int)(Util.A4_WIDTH * Util.A4_WEIGHT / 2) - (int)(154 * Util.A4_WEIGHT / 2), 445);
 		insideDotBorder.setBackground(Color.WHITE);
 		insideDotBorder.setOpaque(false);
 		
@@ -103,12 +97,12 @@ public class L_Layout1_1 extends JPanel {
 		content9L.setSize(250, 20);
 		content9L.setLocation(105, 563);
 		
-		JLabel content10L = new JLabel("담임교사                            (인)", JLabel.RIGHT);
+		JLabel content10L = new JLabel("담임교사              " + teacher + "         (인)", JLabel.RIGHT);
 		content10L.setFont(new Font("함초롬바탕", Font.PLAIN, 13));
 		content10L.setSize(250, 20);
 		content10L.setLocation(237, 600);
 		
-		JLabel content11L = new JLabel("출결담당교사                            (인)", JLabel.RIGHT);
+		JLabel content11L = new JLabel("출결담당교사              " + teacher + "         (인)", JLabel.RIGHT);
 		content11L.setFont(new Font("함초롬바탕", Font.PLAIN, 13));
 		content11L.setSize(250, 20);
 		content11L.setLocation(237, 620);

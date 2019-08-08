@@ -15,4 +15,12 @@ public class E_Calendar {
 	public int getMonth() { return month; }
 	public int getDay() { return day; }
 	
+	public static E_Calendar parseToCalendar(String s) {
+		int year = Integer.parseInt(s.substring(0, 4));
+		int month = Integer.parseInt(s.substring(4, 6));
+		int day = Integer.parseInt(s.substring(6, 8));
+		
+		return new E_Calendar(year, month, day);
+	}
+	
 }

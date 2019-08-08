@@ -8,6 +8,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
@@ -85,12 +86,14 @@ public class P_ThirdPanel extends P_PanelParent {
 				res = res.substring(0, res.length() - 2);
 			
 			E_Calendar cData = absence.getOriginData();
-			Util.printComponent("Layout3_1", new L_Layout3_1(numberN, name.getText(), reason.getText(), cData.getYear(), cData.getMonth(), cData.getDay(), res, c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), (String)range_method.getSelectedItem(), teacher.getText()));
-			Util.log(String.format("type:조퇴·결과·지각; number:%s; name:%s; date:%s; teacher:%s;",
-					number.getText(),
-					name.getText(),
-					String.format("%04d. %02d. %02d", c.get(Calendar.YEAR), c.get(Calendar.MONTH)+1, c.get(Calendar.DAY_OF_MONTH)),
-					teacher.getText()));
+			new E_PrintPreview(
+				parent,
+				new JPanel[] {new L_Layout3_1(numberN, name.getText(), reason.getText(), cData.getYear(), cData.getMonth(), cData.getDay(), res, c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), (String)range_method.getSelectedItem(), teacher.getText())},
+				numberN,
+				name.getText(),
+				"조퇴·결과·지각",
+				String.format("사유:%s;발생일:%s;출결교시:%s;확인방법:%s;", reason.getText(), absence.getText(), res, (String)range_method.getSelectedItem())
+			).setVisible(true);
 		}});
 		// </Setting>
 		
@@ -146,6 +149,7 @@ public class P_ThirdPanel extends P_PanelParent {
 		range_method.setSelectedIndex(0);
 		absence.setOrigin(new E_Calendar(0, 0, 0));
 		absence.setText("");
+		teacher.setText(Util.getConfig("teacher"));
 	}
 	
 }

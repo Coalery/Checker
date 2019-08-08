@@ -27,12 +27,12 @@ public class F_StartFrame extends JFrame {
 	private JPanel radioHeadPanel;
 	private JPanel centerPanel;
 	
-	private P_FirstPanel firstP;
-	private P_SecondPanel secondP;
-	private P_ThirdPanel thirdP;
+	private static P_FirstPanel firstP;
+	private static P_SecondPanel secondP;
+	private static P_ThirdPanel thirdP;
 	
 	public F_StartFrame() {
-		super("Checker");
+		super("학급 행정 매니저");
 		setSize(400, 500);
 		
 		try {System.setErr(new PrintStream("./err.hc"));} catch (IOException e) {e.printStackTrace();}
@@ -113,6 +113,12 @@ public class F_StartFrame extends JFrame {
 		c.gridwidth = width;
 		c.gridheight = height;
 		radioHeadPanel.add(obj, c);
+	}
+	
+	public static void refresh() {
+		firstP.initPanel();
+		secondP.initPanel();
+		thirdP.initPanel();
 	}
 	
 	public static void main(String[] args) {

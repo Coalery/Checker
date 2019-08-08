@@ -15,26 +15,21 @@ public class L_Layout3_1 extends JPanel {
 	
 	// A4 Size  210 : 297
 	
-	public static final int A4_WIDTH = 210;
-	public static final int A4_HEIGHT = 297;
-	
-	public static final float A4_WEIGHT = 2.74f;
-	
 	public L_Layout3_1(int number, String name, String reason, int aYear, int aMonth, int aDay, String aPeriod, int year, int month, int day, String aMethod, String teacher) {
 		setLayout(null);
 		setBackground(Color.WHITE);
 		
 		JPanel outsideDotBorder = new JPanel();
 		outsideDotBorder.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK), BorderFactory.createLineBorder(Color.WHITE)), BorderFactory.createLineBorder(Color.BLACK)));
-		outsideDotBorder.setSize((int)(180 * A4_WEIGHT), (int)(247 * A4_WEIGHT));
-		outsideDotBorder.setLocation((int)(15 * A4_WEIGHT), (int)(25 * A4_WEIGHT));
+		outsideDotBorder.setSize((int)(180 * Util.A4_WEIGHT), (int)(247 * Util.A4_WEIGHT));
+		outsideDotBorder.setLocation((int)(15 * Util.A4_WEIGHT), (int)(25 * Util.A4_WEIGHT));
 		outsideDotBorder.setBackground(Color.WHITE);
 		outsideDotBorder.setOpaque(false);
 		
 		JLabel titleL = new JLabel("출결  인정  확인서", JLabel.CENTER);
 		titleL.setFont(new Font("함초롬돋움", Font.BOLD, 30));
 		titleL.setSize(300, 100);
-		titleL.setLocation((int)(L_Layout1_1.A4_WIDTH * L_Layout1_1.A4_WEIGHT / 2) - 150, 73);
+		titleL.setLocation((int)(Util.A4_WIDTH * Util.A4_WEIGHT / 2) - 150, 73);
 		
 		JLabel numberL = new JLabel("학  번  :  " + number);
 		numberL.setFont(new Font("함초롬돋움", Font.PLAIN, 12));
@@ -69,12 +64,12 @@ public class L_Layout3_1 extends JPanel {
 		JLabel content5L = new JLabel(year + "년      " + month + "월      " + day + "일", JLabel.CENTER);
 		content5L.setFont(new Font("함초롬바탕", Font.PLAIN, 12));
 		content5L.setSize(200, 20);
-		content5L.setLocation((int)(L_Layout1_1.A4_WIDTH * L_Layout1_1.A4_WEIGHT / 2) - 100, 348);
+		content5L.setLocation((int)(Util.A4_WIDTH * Util.A4_WEIGHT / 2) - 100, 348);
 		
 		JPanel insideDotBorder = new JPanel();
 		insideDotBorder.setBorder(new DashedBorder());
-		insideDotBorder.setSize((int)(154 * A4_WEIGHT), (int)(44.26 * A4_WEIGHT));
-		insideDotBorder.setLocation((int)(L_Layout1_1.A4_WIDTH * L_Layout1_1.A4_WEIGHT / 2) - (int)(154 * A4_WEIGHT / 2), 395);
+		insideDotBorder.setSize((int)(154 * Util.A4_WEIGHT), (int)(44.26 * Util.A4_WEIGHT));
+		insideDotBorder.setLocation((int)(Util.A4_WIDTH * Util.A4_WEIGHT / 2) - (int)(154 * Util.A4_WEIGHT / 2), 395);
 		insideDotBorder.setBackground(Color.WHITE);
 		insideDotBorder.setOpaque(false);
 		
@@ -90,7 +85,7 @@ public class L_Layout3_1 extends JPanel {
 		
 		JLabel content8L = new JLabel("2.  확인  방법  :  " + aMethod);
 		content8L.setFont(new Font("함초롬바탕", Font.PLAIN, 13));
-		content8L.setSize(250, 20);
+		content8L.setSize(300, 20);
 		content8L.setLocation(105, 455);
 		
 		JLabel content9L = new JLabel("담임교사      " + teacher + "    인", JLabel.LEFT);
@@ -101,58 +96,58 @@ public class L_Layout3_1 extends JPanel {
 		JLabel footer = new JLabel("화명고등학교장 귀하", JLabel.CENTER);
 		footer.setFont(new Font("함초롬바탕", Font.BOLD, 22));
 		footer.setSize(250, 30);
-		footer.setLocation((int)(L_Layout1_1.A4_WIDTH * L_Layout1_1.A4_WEIGHT / 2) - 125, 540);
+		footer.setLocation((int)(Util.A4_WIDTH * Util.A4_WEIGHT / 2) - 125, 540);
 		
 		JPanel footerBorder1 = new JPanel();
 		footerBorder1.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		footerBorder1.setSize((int)(88.14f * A4_WEIGHT), (int)(30.01f * A4_WEIGHT));
+		footerBorder1.setSize((int)(88.14f * Util.A4_WEIGHT), (int)(30.01f * Util.A4_WEIGHT));
 		footerBorder1.setLocation(264, 596);
 		footerBorder1.setBackground(Color.WHITE);
 		footerBorder1.setOpaque(false);
 		
 		JPanel footerBorder2 = new JPanel();
 		footerBorder2.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		footerBorder2.setSize((int)(88.14 * A4_WEIGHT), 3);
+		footerBorder2.setSize((int)(88.14 * Util.A4_WEIGHT), 3);
 		footerBorder2.setLocation(264, 616);
 		footerBorder2.setBackground(Color.WHITE);
 		
 		JPanel footerBorder3 = new JPanel();
 		footerBorder3.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		footerBorder3.setSize((int)(22.03 * A4_WEIGHT), (int)(30.01 * A4_WEIGHT));
+		footerBorder3.setSize((int)(22.03 * Util.A4_WEIGHT), (int)(30.01 * Util.A4_WEIGHT));
 		footerBorder3.setLocation(264, 596);
 		footerBorder3.setBackground(Color.WHITE);
 		footerBorder3.setOpaque(false);
 		
 		JPanel footerBorder4 = new JPanel();
 		footerBorder4.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		footerBorder4.setSize((int)(22.03 * A4_WEIGHT), (int)(30.01 * A4_WEIGHT));
+		footerBorder4.setSize((int)(22.03 * Util.A4_WEIGHT), (int)(30.01 * Util.A4_WEIGHT));
 		footerBorder4.setLocation(388, 596);
 		footerBorder4.setBackground(Color.WHITE);
 		footerBorder4.setOpaque(false);
 		
 		JLabel footerLabel1 = new JLabel("계", JLabel.CENTER);
 		footerLabel1.setFont(new Font("함초롬돋움", Font.PLAIN, 11));
-		footerLabel1.setSize((int)(22.03 * A4_WEIGHT), (int)(6.52 * A4_WEIGHT));
+		footerLabel1.setSize((int)(22.03 * Util.A4_WEIGHT), (int)(6.52 * Util.A4_WEIGHT));
 		footerLabel1.setLocation(264, 597);
 		
 		JLabel footerLabel2 = new JLabel("교무부장", JLabel.CENTER);
 		footerLabel2.setFont(new Font("함초롬돋움", Font.PLAIN, 11));
-		footerLabel2.setSize((int)(22.03 * A4_WEIGHT), (int)(6.52 * A4_WEIGHT));
+		footerLabel2.setSize((int)(22.03 * Util.A4_WEIGHT), (int)(6.52 * Util.A4_WEIGHT));
 		footerLabel2.setLocation(326, 597);
 		
 		JLabel footerLabel3 = new JLabel("교감", JLabel.CENTER);
 		footerLabel3.setFont(new Font("함초롬돋움", Font.PLAIN, 11));
-		footerLabel3.setSize((int)(22.03 * A4_WEIGHT), (int)(6.52 * A4_WEIGHT));
+		footerLabel3.setSize((int)(22.03 * Util.A4_WEIGHT), (int)(6.52 * Util.A4_WEIGHT));
 		footerLabel3.setLocation(388, 597);
 		
 		JLabel footerLabel4 = new JLabel("교장", JLabel.CENTER);
 		footerLabel4.setFont(new Font("함초롬돋움", Font.PLAIN, 11));
-		footerLabel4.setSize((int)(22.03 * A4_WEIGHT), (int)(6.52 * A4_WEIGHT));
+		footerLabel4.setSize((int)(22.03 * Util.A4_WEIGHT), (int)(6.52 * Util.A4_WEIGHT));
 		footerLabel4.setLocation(446, 597);
 		
 		JLabel footerLabel5 = new JLabel("전결", JLabel.CENTER);
 		footerLabel5.setFont(new Font("바탕", Font.PLAIN, 15));
-		footerLabel5.setSize((int)(22.03 * A4_WEIGHT), (int)(23.49 * A4_WEIGHT));
+		footerLabel5.setSize((int)(22.03 * Util.A4_WEIGHT), (int)(23.49 * Util.A4_WEIGHT));
 		footerLabel5.setLocation(389, 616);
 		
 		add(outsideDotBorder);
@@ -167,7 +162,7 @@ public class L_Layout3_1 extends JPanel {
 //	public static void main(String[] args) {
 //		JFrame frame = new JFrame();
 //		frame.getContentPane().add(new L_Layout3_1(20613, "김현우", "사유", 2019, 8, 11, "1~2교시", 2019, 8, 7, "확인방법", "쌤성함"));
-//		frame.getContentPane().setPreferredSize(new Dimension((int)(A4_WIDTH * A4_WEIGHT), (int)(A4_HEIGHT * A4_WEIGHT)));
+//		frame.getContentPane().setPreferredSize(new Dimension((int)(Util.A4_WIDTH * Util.A4_WEIGHT), (int)(A4_HEIGHT * Util.A4_WEIGHT)));
 //		frame.pack();
 //		
 //		frame.addWindowListener(new WindowAdapter() {public void windowClosing(WindowEvent event) {System.exit(0);}});

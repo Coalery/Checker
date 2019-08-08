@@ -16,8 +16,7 @@ import javax.swing.JTextField;
 @SuppressWarnings("serial")
 public class D_OptionDialog extends JDialog {
 	
-	private final int LAYOUT_PANEL_OPTION_COUNT = 6;
-	private final int OPTION_PANEL_COUNT = 2;
+	private final int OPTION_PANEL_COUNT = 1;
 	
 	private JPanel[] optionPanels;
 	
@@ -65,92 +64,31 @@ public class D_OptionDialog extends JDialog {
 		// <OptionPanel_0>
 		optionPanels[0].setLayout(null);
 		
-		JLabel working = new JLabel("< 공사중 >");
+		JLabel teacherL = new JLabel("선생님 성함 : ");
+		teacherL.setSize(80, 20);
+		teacherL.setLocation(15, 10);
 		
-		working.setSize(60, 20);
-		working.setLocation(232, 126);
+		final JTextField teacher = new JTextField(Util.getConfig("teacher"));
+		teacher.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		teacher.setSize(340, 20);
+		teacher.setLocation(105, 10);
 		
-		optionPanels[0].add(working);
+		JButton teacherApply = (JButton)Util.getDefaultComponent(new JButton("적용"), Color.WHITE, true);
+		teacherApply.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		teacherApply.setSize(50, 20);
+		teacherApply.setLocation(460, 10);
+		
+		teacherApply.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
+			Util.changeConfig("teacher", teacher.getText());
+			F_StartFrame.refresh();
+		}});
+		
+		optionPanels[0].add(teacherL);
+		optionPanels[0].add(teacher);
+		optionPanels[0].add(teacherApply);
 		// </OptionPanel_0>
 		
-		// <optionPanel_1>
-		optionPanels[1].setLayout(null);
-		
-		JPanel[] structs = new JPanel[LAYOUT_PANEL_OPTION_COUNT];
-		String[] labelName = {"결석계", "학습 계획서", "학부모 동의서", "학습 결과 보고서", "결석계", "출결 인정 확인서"};
-		
-		for(int i=0; i<LAYOUT_PANEL_OPTION_COUNT; i++) {
-			structs[i] = new JPanel();
-			structs[i].setLayout(null);
-			structs[i].setSize(500, 20);
-			
-			JLabel label = new JLabel(labelName[i]);
-			label.setSize(140, 20);
-			label.setLocation(0, 0);
-			
-			JTextField locField = new JTextField();
-			locField.setSize(250, 20);
-			locField.setLocation(150, 0);
-			locField.setEditable(false);
-			
-			String path = Util.getConfig("lay" + i + "_LOCATION");
-			if(path != null)
-				locField.setText(path);
-			
-			JButton button = new JButton("찾기");
-			button.setSize(60, 20);
-			button.setLocation(420, 0);
-			
-			button.setFocusPainted(false);
-			button.setOpaque(true);
-			button.setBackground(Color.WHITE);
-			button.addActionListener(new LO_Listener("lay" + i, locField));
-			
-			structs[i].add(label);
-			structs[i].add(locField);
-			structs[i].add(button);
-		}
-		
-		JPanel firstOption = new JPanel();
-		firstOption.setLayout(null);
-		firstOption.setBorder(BorderFactory.createTitledBorder("현장체험"));
-		firstOption.setSize(515, 110);
-		firstOption.setLocation(5, 5);
-		
-		for(int i=0; i<4; i++) {
-			structs[i].setSize(490, 20);
-			structs[i].setLocation(17, 15 + i*22);
-			firstOption.add(structs[i]);
-		}
-		optionPanels[1].add(firstOption);
-		
-		JPanel secondOption = new JPanel();
-		secondOption.setLayout(null);
-		secondOption.setBorder(BorderFactory.createTitledBorder("결석"));
-		secondOption.setSize(515, 43);
-		secondOption.setLocation(5, 124);
-		
-		structs[4].setSize(490, 20);
-		structs[4].setLocation(17, 15);
-		secondOption.add(structs[4]);
-		
-		optionPanels[1].add(secondOption);
-		
-		JPanel thirdOption = new JPanel();
-		thirdOption.setLayout(null);
-		thirdOption.setBorder(BorderFactory.createTitledBorder("조퇴·결과·지각"));
-		thirdOption.setSize(515, 43);
-		thirdOption.setLocation(5, 181);
-		
-		structs[5].setSize(490, 20);
-		structs[5].setLocation(17, 15);
-		thirdOption.add(structs[5]);
-		
-		optionPanels[1].add(thirdOption);
-		
-		// </optionPanel_1>
 		optionPanels[0].setVisible(true);
-		optionPanels[1].setVisible(false);
 		
 		add(selectOptionPanel);
 		
@@ -176,31 +114,6 @@ public class D_OptionDialog extends JDialog {
 					optionPanels[i].setVisible(false);
 			optionPanels[index].setVisible(true);
 //			selectIndex = index;
-		}
-		
-	}
-	
-	/**
-	 * @author Coalery (김현우)
-	 * 기능 : 옵션 - 레이아웃 부분에서 추가되는 버튼들에 추가될 리스너의 기능을 구현함. 
-	 */
-	private class LO_Listener implements ActionListener {
-		
-		private String targetName;
-		private JTextField text;
-		
-		public LO_Listener(String targetName, JTextField text) {
-			this.targetName = targetName;
-			this.text = text;
-		}
-		
-		@Override
-		public void actionPerformed(ActionEvent event) {
-			String path = Util.getPathByFileDialog();
-			if(path == null)
-				return;
-			text.setText(path);
-			Util.changeConfig(targetName + "_LOCATION", text.getText());
 		}
 		
 	}
