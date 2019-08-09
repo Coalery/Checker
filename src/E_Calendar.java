@@ -23,4 +23,6 @@ public class E_Calendar {
 		return new E_Calendar(year, month, day);
 	}
 	
+	public String toString() { return year + "/" + month + "/" + day; }
+	
 }

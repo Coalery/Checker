@@ -3,8 +3,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class E_SqliteDBManager {
@@ -24,7 +26,7 @@ public class E_SqliteDBManager {
 		
 		String url = "jdbc:sqlite:" + f.getAbsolutePath();
 		String sql = "CREATE TABLE \"log\" (\n" + 
-				" number	INTEGER,\n" + 
+				" number INTEGER,\n" + 
 				" name TEXT,\n" + 
 				" type TEXT,\n" + 
 				" writeDate TEXT,\n" + 
@@ -82,6 +84,37 @@ public class E_SqliteDBManager {
 			if(conn != null)
 				try { conn.close(); } catch(SQLException e) { e.printStackTrace(System.err); }
 		}
+	}
+	
+	public static ArrayList<E_SqliteDataSet> getData(String sql) {
+		createNewDBFile();
+		ArrayList<E_SqliteDataSet> res = new ArrayList<E_SqliteDataSet>();
+		String url = "jdbc:sqlite:" + new File("log.db").getAbsolutePath();
+		
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		try {
+			
+			conn = DriverManager.getConnection(url);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			
+			while(rs.next())
+				res.add(new E_SqliteDataSet(rs.getInt("number"), rs.getString("name"), rs.getString("type"), rs.getString("writeDate"), rs.getString("writeTime"), rs.getString("teacher"), rs.getString("etc")));
+			
+		} catch(SQLException e) {
+			e.printStackTrace(System.err);
+		} finally {
+			if(rs != null)
+				try { rs.close(); } catch(SQLException e) { e.printStackTrace(System.err); }
+			if(stmt != null)
+				try { stmt.close(); } catch(SQLException e) { e.printStackTrace(System.err); }
+			if(conn != null)
+				try { conn.close(); } catch(SQLException e) { e.printStackTrace(System.err); }
+		}
+		return res;
 	}
 	
 }

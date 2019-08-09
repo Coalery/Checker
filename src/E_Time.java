@@ -23,4 +23,6 @@ public class E_Time {
 		return new E_Time(year, month, day);
 	}
 	
+	public String toString() { return hour + ":" + minute + ":" + second; }
+	
 }

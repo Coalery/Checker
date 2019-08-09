@@ -47,16 +47,21 @@ public class F_StartFrame extends JFrame {
 		JMenuBar menubar = new JMenuBar();
 		JMenu menu = new JMenu("도구");
 		
-		JMenuItem modifyData = new JMenuItem("데이터 수정");
+		JMenuItem modifyData = new JMenuItem("학생 데이터 수정");
 		modifyData.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
 			Util.createDataFile();
 			Util.execCommand("notepad.exe data.hc");
 		}});
 		
+		JMenuItem data = new JMenuItem("출력 데이터 보기");
+		data.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {new D_SqliteShowDialog(F_StartFrame.this);}});
+		
 		JMenuItem option = new JMenuItem("옵션");
 		option.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {new D_OptionDialog(F_StartFrame.this, true);}});
 		
 		menu.add(modifyData);
+		menu.add(data);
+		menu.addSeparator();
 		menu.add(option);
 		
 		menubar.add(menu);

@@ -30,6 +30,7 @@ public class E_PrintPreview extends JDialog {
 	public E_PrintPreview(JFrame parent, JPanel[] component, int number, String name, String type, String etc) {
 		super(parent, "인쇄 미리보기", true);
 		
+		int deleteThis = -1;
 		E_SqliteDBManager.insertData(number, name, type, etc);
 		
 		final JPanel showPanel = new JPanel();
