@@ -3,7 +3,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
 
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -11,7 +10,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
 
 /**StartFrame 에서 조퇴·결과·지각을 누를시에 나올 Panel 을 구성설정하는 클래스
  * @author Coalery ( 김현우 )
@@ -22,7 +20,7 @@ public class P_ThirdPanel extends P_PanelParent {
 	
 	private JFrame parent;
 	private JTextArea reason;
-	private JCheckBox[] range;
+	private S_RangeSlider slider;
 	private JComboBox<String> range_method;
 	
 	private T_CalendarTextField absence;
@@ -45,8 +43,7 @@ public class P_ThirdPanel extends P_PanelParent {
 		
 		JLabel range_L = new JLabel("출결 교시 : ");
 		JLabel[] range_specific_L = new JLabel[7];
-		range = new JCheckBox[7];
-		for(int i=0; i<range.length; i++) range[i] = new JCheckBox();
+		slider = new S_RangeSlider(1, 7);
 		for(int i=0; i<range_specific_L.length; i++) range_specific_L[i] = new JLabel(String.valueOf(i+1), JLabel.CENTER);
 		
 		JLabel range_method_L = new JLabel("확인방법 : ");
@@ -58,13 +55,8 @@ public class P_ThirdPanel extends P_PanelParent {
 		// <Setting>
 		reason.setLineWrap(true);
 		reason.setWrapStyleWord(true);
-		for(int i=0; i<range.length; i++) {
-			range[i].setHorizontalAlignment(SwingConstants.CENTER);
-		}
 		print.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
 			boolean isRangeSelected = false;
-			for(int i=0; i<range.length; i++)
-				if(range[i].isSelected())
 					isRangeSelected = true;
 			if(number.getText().equals("") || name.getText().equals("") || !isRangeSelected || reason.getText().equals("") || absence.getText().equals("") || absence.getOriginData().equals(new E_Calendar(0, 0, 0))) {
 				Util.showMessage("아직 입력하지 않은 정보가 있습니다.", JOptionPane.ERROR_MESSAGE);
@@ -77,14 +69,11 @@ public class P_ThirdPanel extends P_PanelParent {
 			}
 			
 			Calendar c = Calendar.getInstance();
-			StringBuilder period = new StringBuilder();
-			for(int i=0; i<range.length; i++)
-				if(range[i].isSelected())
-					period.append((i+1) + "교시, ");
-			String res = period.toString();
-			if(res.length() != 0)
-				res = res.substring(0, res.length() - 2);
-			
+			String res = null;
+			if(slider.getValue() == slider.getUpperValue())
+				res = slider.getValue() + "교시";
+			else
+				res = slider.getValue() + "교시 ~ " + slider.getUpperValue() + "교시";
 			E_Calendar cData = absence.getOriginData();
 			new E_PrintPreview(
 				parent,
@@ -121,10 +110,8 @@ public class P_ThirdPanel extends P_PanelParent {
 		reason_sp.setLocation(90, 100);
 		absence.setSize(200, 30);
 		absence.setLocation(90, 200);
-		for(int i=0; i<range.length; i++) {
-			range[i].setSize(15, 15);
-			range[i].setLocation(90 + (int)(i*30.85f), 247);
-		}
+		slider.setSize(200, 20);
+		slider.setLocation(90, 247);
 		range_method.setSize(200, 30);
 		range_method.setLocation(90, 297);
 		// </SettingComponents>
@@ -134,7 +121,7 @@ public class P_ThirdPanel extends P_PanelParent {
 		add(absence_L); add(absence);
 		add(range_L);
 		for(int i=0; i<range_specific_L.length; i++) add(range_specific_L[i]);
-		for(int i=0; i<range.length; i++) add(range[i]);
+		add(slider);
 		add(range_method_L); add(range_method);
 		add(teacher_L); add(teacher);
 		// </AddToPanel>
@@ -144,8 +131,8 @@ public class P_ThirdPanel extends P_PanelParent {
 		number.setText("");
 		name.setText("");
 		reason.setText("");
-		for(int i=0; i<range.length; i++)
-			range[i].setSelected(false);
+		slider.setValue(1);
+		slider.setUpperValue(7);
 		range_method.setSelectedIndex(0);
 		absence.setOrigin(new E_Calendar(0, 0, 0));
 		absence.setText("");

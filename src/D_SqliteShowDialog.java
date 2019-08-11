@@ -4,13 +4,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -21,6 +25,7 @@ import javax.swing.table.DefaultTableModel;
 @SuppressWarnings("serial")
 public class D_SqliteShowDialog extends JDialog {
 	
+	private ArrayList<E_SqliteDataSet> dataList;
 	private DefaultTableModel dtm;
 	
 	public D_SqliteShowDialog(JFrame parent) {
@@ -90,7 +95,7 @@ public class D_SqliteShowDialog extends JDialog {
 					Util.showMessage("입력되지 않은 데이터가 있습니다.", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-			} else {
+			} else if(!selected.equals("유형")) {
 				if(field.getText().equals("")) {
 					Util.showMessage("입력되지 않은 데이터가 있습니다.", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -104,12 +109,14 @@ public class D_SqliteShowDialog extends JDialog {
 				sql += "name like '%" + field.getText() + "%'";
 			else if(selected.equals("유형"))
 				sql += "type='" + typeCombo.getSelectedItem() + "'";
-			else if(selected.equals("")) {
+			else if(selected.equals("출력 날짜")) {
 				E_Calendar c = cfield.getOriginData();
 				sql += "writeDate='" + (c.getYear() * 10000 + c.getMonth() * 100 + c.getDay()) + "'";
 			}
 			
-			ArrayList<E_SqliteDataSet> dataList = E_SqliteDBManager.getData(sql);
+			dataList = E_SqliteDBManager.getData(sql);
+			while(dtm.getRowCount() > 0)
+				dtm.removeRow(0);
 			for(int i=0; i<dataList.size(); i++) {
 				E_SqliteDataSet ds = dataList.get(i);
 				dtm.addRow(new String[] {String.valueOf(ds.getNumber()), ds.getName(), ds.getType(), ds.getWriteDate().toString(), ds.getWriteTime().toString(), ds.getTeacher(), ds.getETC()});
@@ -123,15 +130,61 @@ public class D_SqliteShowDialog extends JDialog {
 		upperPanel.add(find);
 		
 		dtm = new DefaultTableModel(new String[][] {}, new String[] {"학번", "이름", "유형", "출력 날짜", "출력 시간", "선생님", "그 외"}) {
-			
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				return false;
-			}
-			
+			public boolean isCellEditable(int row, int column) { return false; }
 		};
 		JTable table = new JTable(dtm);
 		JScrollPane tableScroll = new JScrollPane(table);
+		
+		table.addMouseListener(new MouseAdapter() {public void mouseClicked(MouseEvent e) {
+			if(e.getClickCount() == 2) {
+				E_SqliteDataSet ds = dataList.get(table.getSelectedRow());
+				
+				JDialog detail = new JDialog(parent, "상세 정보", true);
+				detail.setPreferredSize(new Dimension(300, 200));
+				
+				JPanel panel = new JPanel();
+				panel.setLayout(null);
+				
+				ArrayList<String> keylist = new ArrayList<String>();
+				HashMap<String, String> map = new HashMap<>();
+				map.put("학번", String.valueOf(ds.getNumber())); keylist.add("학번");
+				map.put("이름", ds.getName()); keylist.add("이름");
+				map.put("유형", ds.getType()); keylist.add("유형");
+				map.put("출력 날짜", ds.getWriteDate().toString()); keylist.add("출력 날짜");
+				map.put("출력 시간", ds.getWriteTime().toString()); keylist.add("출력 시간");
+				map.put("선생님", ds.getTeacher()); keylist.add("선생님");
+				
+				String[] etcSplit = ds.getETC().split(";");
+				for(int i=0; i<etcSplit.length; i++) {
+					String[] split = etcSplit[i].split(":");
+					map.put(split[0], split[1]);
+					keylist.add(split[0]);
+				}
+				
+				for(int i=0; i<keylist.size(); i++) {
+					String key = keylist.get(i);
+					JLabel l0_1 = new JLabel(key + " : ");
+					l0_1.setSize(100, 20);
+					l0_1.setLocation(10, 10 + i*30);
+					
+					JLabel l0_2 = new JLabel(map.get(key));
+					l0_2.setSize(300, 20);
+					l0_2.setLocation(110, 10 + i*30);
+					
+					panel.add(l0_1);
+					panel.add(l0_2);
+				}
+				
+				panel.setPreferredSize(new Dimension(300, keylist.size() * 30 + 10));
+				
+				JScrollPane pane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+				
+				detail.add(pane, "Center");
+				detail.pack();
+				detail.setVisible(true);
+			}
+		}});
+		table.setToolTipText("더블 클릭시, 상세 정보가 보여집니다.");
 		
 		add(upperPanel, "North");
 		add(tableScroll, "Center");
