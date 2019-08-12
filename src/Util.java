@@ -306,7 +306,7 @@ public class Util {
 	 * @see javax.swing.JOptionPane
 	 */
 	public static void teacherNameDialog() {
-		String teacherName = JOptionPane.showInputDialog("이 프로그램을 사용하시는 선생님의 성함을 입력해주세요.\n* 초기 한번만 하면 됩니다.\n* 입력하지 않으시면 프로그램 가동이 불가능합니다.");
+		String teacherName = JOptionPane.showInputDialog("프로그램을 사용하시는 사용자의 이름을 입력하세요.");
 		if(teacherName == null)
 			System.exit(0);
 		if(teacherName.equals(""))

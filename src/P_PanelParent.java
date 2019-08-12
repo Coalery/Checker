@@ -5,6 +5,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -38,6 +39,8 @@ public class P_PanelParent extends JPanel {
 		
 		teacher_L = new JLabel("선생님 : ");
 		teacher = new JLabel(Util.getConfig("teacher"));
+		
+		JPanel bPanel = new JPanel();
 		// </Define>
 		
 		// <Setting>
@@ -56,6 +59,7 @@ public class P_PanelParent extends JPanel {
 		numberConfirm.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
 			numberConfirm();
 		}});
+		bPanel.setBorder(BorderFactory.createMatteBorder(6, 0, 0, 0, new Color(200, 200, 200)));
 		// </Setting>
 		
 		// <SettingLabel>
@@ -73,13 +77,15 @@ public class P_PanelParent extends JPanel {
 		name.setSize(200, 30);
 		name.setLocation(90, 60);
 		print.setSize(100, 30);
-		print.setLocation(140, 370);
+		print.setLocation(140, 435);
+		bPanel.setSize(400, 10);
+		bPanel.setLocation(0, 400);
 		// </SettingComponents>
 		
 		// <AddToPanel>
 		add(number_L); add(number); add(numberConfirm);
 		add(name_L); add(name);
-		add(print);
+		add(print); add(bPanel);
 		// </AddToPanel>
 	}
 	

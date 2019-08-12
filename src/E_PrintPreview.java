@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 @SuppressWarnings("serial")
 public class E_PrintPreview extends JDialog {
@@ -84,11 +85,14 @@ public class E_PrintPreview extends JDialog {
 		arrowPanel.add(printing);
 		arrowPanel.add(right);
 		
-		add(showPanel, "Center");
+		JScrollPane scroll = new JScrollPane(showPanel);
+		scroll.setPreferredSize(new Dimension((int)(Util.A4_WIDTH * Util.A4_WEIGHT) + 18, 500));
+		
+		add(scroll, "Center");
 		add(arrowPanel, "South");
 		
 		pack();
 		
-		setResizable(false);
+//		setResizable(false);
 	}
 }

@@ -1,5 +1,7 @@
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -10,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -33,7 +36,7 @@ public class F_StartFrame extends JFrame {
 	
 	public F_StartFrame() {
 		super("학급 행정 매니저");
-		setSize(400, 500);
+		setSize(400, 600);
 		
 		try {System.setErr(new PrintStream("./err.hc"));} catch (IOException e) {e.printStackTrace();}
 		addWindowListener(new WindowAdapter() {public void windowClosing(WindowEvent e) {System.exit(0);}});
@@ -92,11 +95,17 @@ public class F_StartFrame extends JFrame {
 		radioHeadPanel.setLayout(new GridBagLayout());
 		rbGroup.add(rb1); rbGroup.add(rb2); rbGroup.add(rb3);
 		
+		radioHeadPanel.setPreferredSize(new Dimension(radioHeadPanel.getPreferredSize().width, 50));
+		
+		radioHeadPanel.setBorder(BorderFactory.createMatteBorder(6, 6, 6, 6, new Color(200, 200, 200)));
+		System.out.println(radioHeadPanel.getPreferredSize());
+		
 		add(radioHeadPanel, "North");
 		
 		centerPanel = new JPanel();
 		card = new CardLayout();
 		centerPanel.setLayout(card);
+		centerPanel.setBorder(BorderFactory.createMatteBorder(0, 6, 6, 6, new Color(200, 200, 200)));
 		
 		add(centerPanel, "Center");
 		
