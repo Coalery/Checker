@@ -77,7 +77,7 @@ public class P_PanelParent extends JPanel {
 		name.setSize(200, 30);
 		name.setLocation(90, 60);
 		print.setSize(100, 30);
-		print.setLocation(140, 435);
+		print.setLocation(150, 430);
 		bPanel.setSize(400, 10);
 		bPanel.setLocation(0, 400);
 		// </SettingComponents>

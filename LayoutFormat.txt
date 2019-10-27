@@ -1,0 +1,16 @@
+ 0 String name			NULL X
+ 1 int PosX			NULL X
+ 2 int PosY			NULL X
+ 3 int width			NULL X
+ 4 int height			NULL X
+ 5 String text			NULL O
+ 6 Font font			NULL O	// 그러나 text 가 NOT NULL 인 경우, 불가 ( 기본값 > 굴림, 보통, 13 )
+ 7 Color textColor		NULL O	// 그러나 text 가 NOT NULL 인 경우, 불가 ( 기본값 > R51, B51, G51 )
+ 8 int textAlign		NULL X	// text 가 NULL 인 경우, 기본값 적용 ( 기본값 > SwingConstants.LEFT )
+ 9 BorderType borderType	NULL O
+10 int borderThickness		NULL X	// borderType 이 NULL 인 경우, 기본값 적용 ( 기본값 > 0 )
+11 Color borderColor		NULL O	// 그러나 borderType 이 NOT NULL 인 경우, 불가 ( 기본값 > null )
+12 Color bgColor		NULL X
+13 boolean bgOpaque		NULL X
+
+Consolas

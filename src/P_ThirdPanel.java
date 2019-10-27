@@ -49,7 +49,7 @@ public class P_ThirdPanel extends P_PanelParent {
 		JLabel range_method_L = new JLabel("확인방법 : ");
 		range_method = (JComboBox<String>) Util.getDefaultComponent(new JComboBox<>(new String[] {"학생과 면담", "증빙서류 확인", "보호자 확인"}), Color.WHITE);
 		
-		
+		JLabel reasonExample = new JLabel("<html><div style=\"text-align: center;\">(예)</div></span><br><div style=\"text-align:center;\">출결유형(내용)</div></html>", JLabel.CENTER);
 		// </Define>
 		
 		// <Setting>
@@ -89,6 +89,8 @@ public class P_ThirdPanel extends P_PanelParent {
 		// <SettingLabel>
 		reason_L.setSize(60, 30);
 		reason_L.setLocation(20, 100);
+		reasonExample.setSize(150, 80);
+		reasonExample.setLocation(272, 100);
 		absence_L.setSize(80, 30);
 		absence_L.setLocation(20, 200);
 		range_L.setSize(80, 30);
@@ -117,7 +119,7 @@ public class P_ThirdPanel extends P_PanelParent {
 		// </SettingComponents>
 		
 		// <AddToPanel>
-		add(reason_L); add(reason_sp);
+		add(reason_L); add(reason_sp); add(reasonExample);
 		add(absence_L); add(absence);
 		add(range_L);
 		for(int i=0; i<range_specific_L.length; i++) add(range_specific_L[i]);

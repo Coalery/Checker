@@ -50,11 +50,13 @@ public class P_SecondPanel extends P_PanelParent {
 		JLabel absence_count_L = new JLabel("일간");
 		absence_count = new JTextField();
 		
-		JLabel absence_type_L = new JLabel("결석유형 : ");
+		JLabel absence_type_L = new JLabel("결석 유형 : ");
 		absence_type = (JComboBox<String>) Util.getDefaultComponent(new JComboBox<String>(new String[] {"인정결", "병결"}), Color.WHITE);
 		
-		JLabel absence_method_L = new JLabel("확인방법 : ");
+		JLabel absence_method_L = new JLabel("확인 방법 : ");
 		absence_method = (JComboBox<String>) Util.getDefaultComponent(new JComboBox<>(new String[] {"학생과 면담", "증빙서류 확인", "보호자 확인"}), Color.WHITE);
+		
+		JLabel reasonExample = new JLabel("<html><div style=\"text-align: center;\">(예)</div></span><br><div style=\"text-align:center;\">결석유형(내용)</div></html>", JLabel.CENTER);
 		// </Define>
 		
 		// <Setting>
@@ -90,6 +92,8 @@ public class P_SecondPanel extends P_PanelParent {
 		// <SettingLabel>
 		reason_L.setSize(60, 30);
 		reason_L.setLocation(20, 100);
+		reasonExample.setSize(150, 80);
+		reasonExample.setLocation(272, 100);
 		absence_L.setSize(80, 30);
 		absence_L.setLocation(20, 200);
 		absence_count_L.setSize(60, 30);
@@ -120,7 +124,7 @@ public class P_SecondPanel extends P_PanelParent {
 		// </SettingComponents>
 		
 		// <AddToPanel>
-		add(reason_L); add(reason_sp);
+		add(reason_L); add(reason_sp); add(reasonExample);
 		add(absence_L); add(absence_count_L); add(absence_start); add(absence_end); add(absence_count);
 		add(absence_type_L); add(absence_type);
 		add(absence_method_L); add(absence_method);

@@ -1,11 +1,7 @@
 import java.awt.CardLayout;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.print.PageFormat;
-import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 
@@ -49,25 +45,16 @@ public class E_PrintPreview extends JDialog {
 		
 		JButton printing = new JButton("인쇄");
 		printing.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
-			PrinterJob pj = PrinterJob.getPrinterJob();
-			pj.setJobName(":: Student Document Printing ::");
 			
-			pj.setPrintable(new Printable() {
-				public int print(Graphics pg, PageFormat pf, int pageNum) {
-					if(pageNum > 0) {
-						return Printable.NO_SUCH_PAGE;
-					}
-					
-					Graphics2D g2 = (Graphics2D) pg;
-					g2.translate(pf.getImageableX(), pf.getImageableY());
-					
-					showPanel.paint(g2);
-					return Printable.PAGE_EXISTS;
-				}
-			});
-			if(!pj.printDialog())
-				return;
-			try { pj.print(); } catch(PrinterException e) { e.printStackTrace(); }
+			for(int i=0; i<component.length; i++) {
+				PrinterJob pj = PrinterJob.getPrinterJob();
+				pj.setJobName(":: Student Document Printing ::");
+				
+				pj.setPrintable(new E_Printable(component[i]));
+				if(!pj.printDialog())
+					return;
+				try { pj.print(); } catch(PrinterException e) { e.printStackTrace(); }
+			}
 			E_SqliteDBManager.insertData(number, name, type, etc);
 		}});
 		
@@ -93,6 +80,6 @@ public class E_PrintPreview extends JDialog {
 		
 		pack();
 		
-//		setResizable(false);
+		setResizable(false);
 	}
 }

@@ -38,6 +38,7 @@ public class D_CalendarDialog extends JDialog {
 		// <DefaultSetting>
 		super(owner, "날짜 선택", true);
 		setSize(300, 250);
+		setLocation(200, 150);
 		
 		Calendar c = Calendar.getInstance();
 		year = c.get(Calendar.YEAR);
@@ -48,7 +49,7 @@ public class D_CalendarDialog extends JDialog {
 		// <UpperComponentSetting>
 		JPanel upper = new JPanel();
 		upper.setLayout(new BorderLayout());
-		upper.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		upper.setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.BLACK));
 		
 		JButton left = (JButton) Util.getDefaultComponent(new JButton("◀"), Color.WHITE, true);
 		when = new JLabel(year + " / " + month, JLabel.CENTER);

@@ -41,7 +41,7 @@ public class L_Layout3_1 extends JPanel {
 		nameL.setSize(100, 20);
 		nameL.setLocation(329, 193);
 		
-		JLabel content1L = new JLabel("위  학생은  다음과  같은  사유로  인하여  결석계를  제출합니다.");
+		JLabel content1L = new JLabel("위  학생은  다음과  같은  사유로  인하여  확인서를  제출합니다.");
 		content1L.setFont(new Font("함초롬바탕", Font.PLAIN, 12));
 		content1L.setSize(400, 20);
 		content1L.setLocation(75, 230);

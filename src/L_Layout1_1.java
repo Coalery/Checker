@@ -102,7 +102,7 @@ public class L_Layout1_1 extends JPanel {
 		content10L.setSize(250, 20);
 		content10L.setLocation(237, 600);
 		
-		JLabel content11L = new JLabel("출결담당교사              " + teacher + "         (인)", JLabel.RIGHT);
+		JLabel content11L = new JLabel("출결담당교사                                 (인)", JLabel.RIGHT);
 		content11L.setFont(new Font("함초롬바탕", Font.PLAIN, 13));
 		content11L.setSize(250, 20);
 		content11L.setLocation(237, 620);

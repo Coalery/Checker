@@ -2,6 +2,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -36,7 +37,7 @@ public class F_StartFrame extends JFrame {
 	
 	public F_StartFrame() {
 		super("학급 행정 매니저");
-		setSize(400, 600);
+		setSize(420, 600);
 		
 		try {System.setErr(new PrintStream("./err.hc"));} catch (IOException e) {e.printStackTrace();}
 		addWindowListener(new WindowAdapter() {public void windowClosing(WindowEvent e) {System.exit(0);}});
@@ -49,18 +50,22 @@ public class F_StartFrame extends JFrame {
 		// <Menu>
 		JMenuBar menubar = new JMenuBar();
 		JMenu menu = new JMenu("도구");
+		menu.setFont(new Font("굴림", Font.PLAIN, 13));
 		
 		JMenuItem modifyData = new JMenuItem("학생 데이터 수정");
 		modifyData.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
 			Util.createDataFile();
 			Util.execCommand("notepad.exe data.hc");
 		}});
+		modifyData.setFont(new Font("굴림", Font.PLAIN, 13));
 		
 		JMenuItem data = new JMenuItem("출력 데이터 보기");
 		data.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {new D_SqliteShowDialog(F_StartFrame.this);}});
+		data.setFont(new Font("굴림", Font.PLAIN, 13));
 		
 		JMenuItem option = new JMenuItem("옵션");
 		option.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {new D_OptionDialog(F_StartFrame.this, true);}});
+		option.setFont(new Font("굴림", Font.PLAIN, 13));
 		
 		menu.add(modifyData);
 		menu.add(data);
@@ -98,7 +103,6 @@ public class F_StartFrame extends JFrame {
 		radioHeadPanel.setPreferredSize(new Dimension(radioHeadPanel.getPreferredSize().width, 50));
 		
 		radioHeadPanel.setBorder(BorderFactory.createMatteBorder(6, 6, 6, 6, new Color(200, 200, 200)));
-		System.out.println(radioHeadPanel.getPreferredSize());
 		
 		add(radioHeadPanel, "North");
 		
