@@ -359,6 +359,8 @@ public class Util {
 	 * @return 색깔을 문자열로 변환한 결과
 	 */
 	public static String colorToString(Color c) {
+		if(c == null)
+			return "R:0, G:0, B:0";
 		return String.format("R:%d, G:%d, B:%d", c.getRed(), c.getGreen(), c.getBlue());
 	}
 	
@@ -384,13 +386,17 @@ public class Util {
 	 * @return 글꼴을 문자열로 변환한 결과
 	 */
 	public static String fontToString(Font f) {
-		String fontString = f.getFontName() + ", ";
+		String fontName = f.getFontName();
+		
+		String fontString = fontName + ", ";
+		if(fontName.contains("Bold"))
+			fontString = fontName.substring(0, fontName.length() - 5) + ", ";
 		if(f.getStyle() == Font.PLAIN)
 			fontString += "보통";
 		else if(f.getStyle() == Font.BOLD)
-			fontString += "기울임꼴";
-		else if(f.getStyle() == Font.ITALIC)
 			fontString += "굵게";
+		else if(f.getStyle() == Font.ITALIC)
+			fontString += "기울임꼴";
 		else if(f.getStyle() == (Font.BOLD | Font.ITALIC))
 			fontString += "굵은 기울임꼴";
 		fontString += ", " + f.getSize();

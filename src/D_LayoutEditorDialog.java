@@ -110,12 +110,24 @@ public class D_LayoutEditorDialog extends JDialog {
 			field.repaint();
 		}});
 		
+		JButton save = new JButton("저장");
+		save.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		save.setBackground(Color.GREEN);
+		save.setSize(50, 24);
+		save.setOpaque(false);
+		save.setFocusPainted(false);
+		save.setLocation(56, 3);
+		save.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
+			save();
+		}});
+		
 		currentSelect = new JLabel("현재 선택 : 없음");
 		currentSelect.setSize(250, 24);
 		currentSelect.setLocation(200, 3);
 		
 		buttonsPanel.setLayout(null);
 		buttonsPanel.add(create);
+		buttonsPanel.add(save);
 		buttonsPanel.add(currentSelect);
 		
 		dtm = new DefaultTableModel(new Object[][] {}, new String[] {"항목", "내용"}) {
@@ -381,7 +393,44 @@ public class D_LayoutEditorDialog extends JDialog {
 	}
 	
 	public void save() {
-		
+		for(int i=0; i<objectList.size(); i++) {
+			O_HCObject object = objectList.get(i);
+			
+			String name = object.getHCName();
+			int x = object.getLocation().x;
+			int y = object.getLocation().y;
+			int width = object.getSize().width;
+			int height = object.getSize().height;
+			
+			String textSTR = "";
+			String text = object.getText();
+			if(text.equals(""))
+				textSTR = ";;;;";
+			else {
+				Font font = object.getFont();
+				Color textColor = object.getForeground();
+				int textAlign = object.getHorizontalAlignment();
+				textSTR = text + ";" + Util.fontToString(font) + ";" + Util.colorToString(textColor) + ";" + Util.alignTypeToString(textAlign) + ";";
+			}
+			
+			String borderSTR = "";
+			O_HCObject.BorderType borderType = object.getBorderType();
+			
+			if(borderType == null)
+				borderSTR = ";0;;";
+			else {
+				int borderThickness = object.getBorderThickness();
+				Color borderColor = object.getBorderColor();
+				borderSTR = borderType.getValue() + ";" + borderThickness + ";" + Util.colorToString(borderColor) + ";";
+			}
+			
+			Color bgColor = object.getBackground();
+			boolean bgOpaque = object.isOpaque();
+			
+			String res = name + ";" + x + ";" + y + ";" + width + ";" + height + ";" + textSTR + borderSTR + Util.colorToString(bgColor) + ";" + bgOpaque + ";";
+			
+			System.out.println(res);
+		}
 	}
 	
 	public boolean load() {

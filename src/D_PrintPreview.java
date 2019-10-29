@@ -12,10 +12,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 @SuppressWarnings("serial")
-public class E_PrintPreview extends JDialog {
+public class D_PrintPreview extends JDialog {
 	
 	/**매개변수로 받은 레이아웃을 출력한다.
-	 * @author Coalery ( 김현우 )
 	 * @param parent
 	 * @param component 출력할 레이아웃
 	 * 
@@ -24,7 +23,7 @@ public class E_PrintPreview extends JDialog {
 	 * @param type 로그로 기록할 데이터
 	 * @param etc 로그로 기록할 데이터
 	 */
-	public E_PrintPreview(JFrame parent, JPanel[] component, int number, String name, String type, String etc) {
+	public D_PrintPreview(JFrame parent, JPanel[] component, int number, String name, String type, String etc) {
 		super(parent, "인쇄 미리보기", true);
 		
 		final JPanel showPanel = new JPanel();

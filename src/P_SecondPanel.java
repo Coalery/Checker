@@ -78,7 +78,7 @@ public class P_SecondPanel extends P_PanelParent {
 			
 			E_Calendar originS = absence_start.getOriginData();
 			E_Calendar originE = absence_end.getOriginData();
-			new E_PrintPreview(
+			new D_PrintPreview(
 				parent,
 				new JPanel[] {new L_Layout2_1(Integer.parseInt(number.getText()), name.getText(), reason.getText(), originS.getYear(), originS.getMonth(), originS.getDay(), originE.getMonth(), originE.getDay(), absence_count_ToInt, c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), parentName, (String)absence_type.getSelectedItem(), (String)absence_method.getSelectedItem(), teacher.getText())},
 				Integer.parseInt(number.getText()),

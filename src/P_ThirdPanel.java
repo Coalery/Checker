@@ -75,7 +75,7 @@ public class P_ThirdPanel extends P_PanelParent {
 			else
 				res = slider.getValue() + "교시 ~ " + slider.getUpperValue() + "교시";
 			E_Calendar cData = absence.getOriginData();
-			new E_PrintPreview(
+			new D_PrintPreview(
 				parent,
 				new JPanel[] {new L_Layout3_1(numberN, name.getText(), reason.getText(), cData.getYear(), cData.getMonth(), cData.getDay(), res, c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), (String)range_method.getSelectedItem(), teacher.getText())},
 				numberN,

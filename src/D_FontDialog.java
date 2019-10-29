@@ -12,7 +12,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -95,23 +94,22 @@ public class D_FontDialog extends JDialog {
 		fontSizeL.setSize(100, 20);
 		fontSizeL.setLocation(335, 5);
 		
-		JTextField fontSize = new JTextField(String.valueOf(currentFont.getSize()));
-		fontSize.setSize(65, 20);
-		fontSize.setLocation(335, 30);
+		Integer[] ints = new Integer[50];
+		for(i=0; i<ints.length; i++)
+			ints[i] = i + 1;
 		
-		fontSizes = new JList<Integer>(new Integer[] {8, 9, 10, 11, 13, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48});
+		fontSizes = new JList<Integer>(ints);
 		fontSizes.setSelectedValue(currentFont.getSize(), false);
 		fontSizes.setFont(new Font("굴림", Font.PLAIN, 13));
 		fontSizes.addListSelectionListener(new ListSelectionListener() {public void valueChanged(ListSelectionEvent e) {
 			if(e.getValueIsAdjusting())
 				return;
-			fontSize.setText(fontSizes.getSelectedValue().toString());
 		}});
 		fontSizes.addListSelectionListener(new FontSelectListener());
 		
 		JScrollPane fontSizeScroll = new JScrollPane(fontSizes);
-		fontSizeScroll.setSize(65, 95);
-		fontSizeScroll.setLocation(335, 50);
+		fontSizeScroll.setSize(65, 115);
+		fontSizeScroll.setLocation(335, 30);
 		fontSizes.ensureIndexIsVisible(fontSizes.getSelectedIndex());
 		
 		preview = new JLabel("ㄱㄴㄷ 가나다 ABC abc", JLabel.RIGHT);
@@ -136,7 +134,7 @@ public class D_FontDialog extends JDialog {
 		
 		add(fontsL); add(fontScroll);
 		add(fontStyleL); add(fontStyleScroll);
-		add(fontSizeL); add(fontSize); add(fontSizeScroll);
+		add(fontSizeL); add(fontSizeScroll);
 		add(preview); add(apply);
 		
 		setResizable(false);
