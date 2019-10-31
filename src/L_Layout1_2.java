@@ -171,7 +171,8 @@ public class L_Layout1_2 extends JPanel {
 		content11L.setSize((int)(27.89f * Util.A4_WEIGHT) - 2, (int)(17.62f * Util.A4_WEIGHT) - 2);
 		content11L.setLocation(432, 238);
 		
-		JLabel content12L = new JLabel(+ grade + "  학년          " + classN + "  반       " + number + "  번      이름  :  " + name);
+		// TODO 2019-11-01 AM 01:45
+		JLabel content12L = new JLabel(grade + "  학년          " + classN + "  반       " + number + "  번      이름  :  " + name);
 		content12L.setFont(new Font("함초롬바탕", Font.PLAIN, 11));
 		content12L.setSize((int)(139.42f * Util.A4_WEIGHT) - 2, (int)(10.87f * Util.A4_WEIGHT) - 2);
 		content12L.setLocation(145, 133);
