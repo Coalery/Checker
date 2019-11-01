@@ -118,6 +118,7 @@ public class D_LayoutEditorDialog extends JDialog {
 		save.setFocusPainted(false);
 		save.setLocation(56, 3);
 		save.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
+			unselect();
 			save();
 		}});
 		

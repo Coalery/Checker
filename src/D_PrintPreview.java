@@ -1,4 +1,5 @@
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,12 +38,12 @@ public class D_PrintPreview extends JDialog {
 		
 		JPanel arrowPanel = new JPanel();
 		
-		JButton left = new JButton("◀");
+		JButton left = (JButton) Util.getDefaultComponent(new JButton("◀"), Color.WHITE, true);
 		left.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
 			card.previous(showPanel);
 		}});
 		
-		JButton printing = new JButton("인쇄");
+		JButton printing = (JButton) Util.getDefaultComponent(new JButton("인쇄"), Color.WHITE, true);
 		printing.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
 			
 			for(int i=0; i<component.length; i++) {
@@ -57,7 +58,7 @@ public class D_PrintPreview extends JDialog {
 			E_SqliteDBManager.insertData(number, name, type, etc);
 		}});
 		
-		JButton right = new JButton("▶");
+		JButton right = (JButton) Util.getDefaultComponent(new JButton("▶"), Color.WHITE, true);
 		right.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
 			card.next(showPanel);
 		}});
