@@ -339,7 +339,7 @@ public class D_LayoutEditorDialog extends JDialog {
 		
 		currentSelect.setText("현재 선택 : " + obj.getHCName());
 		selectedObject = obj;
-		selectedObject.addMouseMotionListener(new ObjectDragAdapter());
+		selectedObject.addMouseMotionListener(new ObjectDragAdapter(obj));
 		
 		field.remove(obj);
 		field.add(selectFrame);
@@ -500,15 +500,18 @@ public class D_LayoutEditorDialog extends JDialog {
 		private O_HCObject obj;
 		private ObjectSelectAdapter(O_HCObject obj) { this.obj = obj; }
 		
-		public void mousePressed(MouseEvent e) {
+		public void mouseReleased(MouseEvent e) {
 			if(selectedObject == null || !selectedObject.equals(obj))
 				select(obj);
 		}
 	}
 	
 	private class ObjectDragAdapter extends MouseMotionAdapter {
+		private O_HCObject obj;
+		private ObjectDragAdapter(O_HCObject obj) { this.obj = obj; }
+		
 		public void mouseDragged(MouseEvent e) {
-			if(selectedObject != null) {
+			if(selectedObject != null && selectedObject.equals(obj)) {
 				Point p = MouseInfo.getPointerInfo().getLocation();
 				SwingUtilities.convertPointFromScreen(p, field);
 				selectFrame.setLocation(p);

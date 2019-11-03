@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
+import java.util.HashMap;
 
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -78,9 +79,27 @@ public class P_SecondPanel extends P_PanelParent {
 			
 			E_Calendar originS = absence_start.getOriginData();
 			E_Calendar originE = absence_end.getOriginData();
+			
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			map.put("$number", Integer.parseInt(number.getText()));
+			map.put("$name", name.getText());
+			map.put("$asYear", originS.getYear());
+			map.put("$asMonth", originS.getMonth());
+			map.put("$asDay", originS.getDay());
+			map.put("$adMonth", originE.getMonth());
+			map.put("$adDay", originE.getDay());
+			map.put("$aDays", absence_count_ToInt);
+			map.put("$year", c.get(Calendar.YEAR));
+			map.put("$month", c.get(Calendar.MONTH) + 1);
+			map.put("$day", c.get(Calendar.DAY_OF_MONTH));
+			map.put("$parentName", parentName);
+			map.put("$aType", absence_type.getSelectedItem());
+			map.put("$reason", reason.getText());
+			map.put("$aMethod", absence_method.getSelectedItem());
+			map.put("$teacher", teacher.getText());
 			new D_PrintPreview(
 				parent,
-				new JPanel[] {new L_Layout2_1(Integer.parseInt(number.getText()), name.getText(), reason.getText(), originS.getYear(), originS.getMonth(), originS.getDay(), originE.getMonth(), originE.getDay(), absence_count_ToInt, c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), parentName, (String)absence_type.getSelectedItem(), (String)absence_method.getSelectedItem(), teacher.getText())},
+				new JPanel[] { new E_LayoutLoader(Util.getConfig("layout21Path"), map) },
 				Integer.parseInt(number.getText()),
 				name.getText(),
 				"결석",

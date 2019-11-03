@@ -85,8 +85,8 @@ public class P_FirstPanel extends P_PanelParent {
 				new JPanel[] {
 					new E_LayoutLoader(Util.getConfig("layout11Path"), map),
 					new E_LayoutLoader(Util.getConfig("layout12Path"), map),
-					new L_Layout1_3(numberN, name.getText(), originS.getYear(), originS.getMonth(), originS.getDay(), originE.getMonth(), originE.getDay(), absence_count_ToInt, c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), parentName),
-					new L_Layout1_4(numberN, name.getText(), originS.getYear(), originS.getMonth(), originS.getDay(), originE.getMonth(), originE.getDay(), absence_count_ToInt, c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), parentName, teacher.getText())
+					new E_LayoutLoader(Util.getConfig("layout13Path"), map),
+					new E_LayoutLoader(Util.getConfig("layout14Path"), map)
 				},
 				numberN,
 				name.getText(),
