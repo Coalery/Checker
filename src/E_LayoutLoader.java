@@ -59,8 +59,9 @@ public class E_LayoutLoader extends JPanel {
 				
 				Color bgColor = Util.stringToColor(splits[O_HCObject.Options.BACKGROUND_COLOR.getValue()]);
 				boolean bgOpaque = Boolean.valueOf(splits[O_HCObject.Options.BACKGROUND_OPAQUE.getValue()]);
+				boolean fixShape = Boolean.valueOf(splits[O_HCObject.Options.FIX_SHAPE.getValue()]);
 				
-				add(new O_HCObject(name, x, y, width, height, text, font, textColor, textAlign, borderType, borderThickness, borderColor, bgColor, bgOpaque));
+				add(new O_HCObject(name, x, y, width, height, text, font, textColor, textAlign, borderType, borderThickness, borderColor, bgColor, bgOpaque, fixShape));
 			}
 		} catch(IOException e) {
 			e.printStackTrace(System.err);

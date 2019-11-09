@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
+import java.util.HashMap;
 
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -75,9 +76,24 @@ public class P_ThirdPanel extends P_PanelParent {
 			else
 				res = slider.getValue() + "교시 ~ " + slider.getUpperValue() + "교시";
 			E_Calendar cData = absence.getOriginData();
+			
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			map.put("$number", numberN);
+			map.put("$name", name.getText());
+			map.put("$reason", reason.getText());
+			map.put("$aYear", cData.getYear());
+			map.put("$aMonth", cData.getMonth());
+			map.put("$aDay", cData.getDay());
+			map.put("$aPeriod", res);
+			map.put("$year", c.get(Calendar.YEAR));
+			map.put("$month", c.get(Calendar.MONTH) + 1);
+			map.put("$day", c.get(Calendar.DAY_OF_MONTH));
+			map.put("$aMethod", range_method.getSelectedItem());
+			map.put("$teacher", teacher.getText());
+			
 			new D_PrintPreview(
 				parent,
-				new JPanel[] {new L_Layout3_1(numberN, name.getText(), reason.getText(), cData.getYear(), cData.getMonth(), cData.getDay(), res, c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), (String)range_method.getSelectedItem(), teacher.getText())},
+				new JPanel[] { new E_LayoutLoader(Util.getConfig("layout31Path"), map) },
 				numberN,
 				name.getText(),
 				"조퇴·결과·지각",

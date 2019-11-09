@@ -12,5 +12,4 @@
 11 Color borderColor		NULL O	// 그러나 borderType 이 NOT NULL 인 경우, 불가 ( 기본값 > null )
 12 Color bgColor		NULL X
 13 boolean bgOpaque		NULL X
-
-Consolas
+14 boolean fixShape		NULL X

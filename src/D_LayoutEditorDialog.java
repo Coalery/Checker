@@ -13,10 +13,13 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -109,6 +112,7 @@ public class D_LayoutEditorDialog extends JDialog {
 			
 			field.repaint();
 		}});
+		create.setFocusable(false);
 		
 		JButton save = new JButton("저장");
 		save.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -121,6 +125,7 @@ public class D_LayoutEditorDialog extends JDialog {
 			unselect();
 			save();
 		}});
+		save.setFocusable(false);
 		
 		currentSelect = new JLabel("현재 선택 : 없음");
 		currentSelect.setSize(250, 24);
@@ -214,6 +219,11 @@ public class D_LayoutEditorDialog extends JDialog {
 	        	selectedObject.setHCName((String)tcl.getNewValue());
 	        	currentSelect.setText("현재 선택 : " + tcl.getNewValue());
 	        } else if(tcl.getRow() == O_HCObject.Options.POS_X.getValue()) {
+	        	if(selectedObject.isFixShape()) {
+	        		Util.showMessage("모양과 위치가 고정되어있습니다.\n수정을 하시려면 고정을 풀어주세요.", JOptionPane.ERROR_MESSAGE);
+	        		dtm.setValueAt(tcl.getOldValue(), O_HCObject.Options.POS_X.getValue(), 1);
+	        		return;
+	        	}
 	        	int x = -1;
 	        	try { x = Integer.parseInt((String)tcl.getNewValue()); } catch(NumberFormatException ex) {
 	        		Util.showMessage("숫자만 입력할 수 있습니다.", JOptionPane.ERROR_MESSAGE);
@@ -223,6 +233,11 @@ public class D_LayoutEditorDialog extends JDialog {
 	        	dtm.setValueAt(x, O_HCObject.Options.POS_X.getValue(), 1);
 	        	selectFrame.setLocation(x - 1, selectFrame.getLocation().y);
 	        } else if(tcl.getRow() == O_HCObject.Options.POS_Y.getValue()) {
+	        	if(selectedObject.isFixShape()) {
+	        		Util.showMessage("모양과 위치가 고정되어있습니다.\n수정을 하시려면 고정을 풀어주세요.", JOptionPane.ERROR_MESSAGE);
+	        		dtm.setValueAt(tcl.getOldValue(), O_HCObject.Options.POS_X.getValue(), 1);
+	        		return;
+	        	}
 	        	int y = -1;
 	        	try { y = Integer.parseInt((String)tcl.getNewValue()); } catch(NumberFormatException ex) {
 	        		Util.showMessage("숫자만 입력할 수 있습니다.", JOptionPane.ERROR_MESSAGE);
@@ -232,6 +247,11 @@ public class D_LayoutEditorDialog extends JDialog {
 	        	dtm.setValueAt(y, O_HCObject.Options.POS_Y.getValue(), 1);
 	        	selectFrame.setLocation(selectFrame.getLocation().x, y - 1);
 	        } else if(tcl.getRow() == O_HCObject.Options.WIDTH.getValue()) {
+	        	if(selectedObject.isFixShape()) {
+	        		Util.showMessage("모양과 위치가 고정되어있습니다.\n수정을 하시려면 고정을 풀어주세요.", JOptionPane.ERROR_MESSAGE);
+	        		dtm.setValueAt(tcl.getOldValue(), O_HCObject.Options.POS_X.getValue(), 1);
+	        		return;
+	        	}
 	        	int width = -1;
 	        	try { width = Integer.parseInt((String)tcl.getNewValue()); } catch(NumberFormatException ex) {
 	        		Util.showMessage("숫자만 입력할 수 있습니다.", JOptionPane.ERROR_MESSAGE);
@@ -242,6 +262,11 @@ public class D_LayoutEditorDialog extends JDialog {
 	        	selectFrame.setSize(width + 2, selectFrame.getSize().height);
 	        	selectedObject.setSize(width, selectFrame.getSize().height - 2);
 	        } else if(tcl.getRow() == O_HCObject.Options.HEIGHT.getValue()) {
+	        	if(selectedObject.isFixShape()) {
+	        		Util.showMessage("모양과 위치가 고정되어있습니다.\n수정을 하시려면 고정을 풀어주세요.", JOptionPane.ERROR_MESSAGE);
+	        		dtm.setValueAt(tcl.getOldValue(), O_HCObject.Options.POS_X.getValue(), 1);
+	        		return;
+	        	}
 	        	int height = -1;
 	        	try { height = Integer.parseInt((String)tcl.getNewValue()); } catch(NumberFormatException ex) {
 	        		Util.showMessage("숫자만 입력할 수 있습니다.", JOptionPane.ERROR_MESSAGE);
@@ -276,6 +301,9 @@ public class D_LayoutEditorDialog extends JDialog {
 	        } else if(tcl.getRow() == O_HCObject.Options.BACKGROUND_OPAQUE.getValue()) {
 	        	selectedObject.setOpaque((boolean)tcl.getNewValue());
 	        	repaint();
+	        } else if(tcl.getRow() == O_HCObject.Options.FIX_SHAPE.getValue()) {
+	        	selectedObject.setFixShape((boolean)tcl.getNewValue());
+	        	repaint();
 	        }
 		}});
 		JComboBox<String> combo1 = new JComboBox<>(new String[] {"왼쪽", "가운데", "오른쪽"});
@@ -286,6 +314,7 @@ public class D_LayoutEditorDialog extends JDialog {
 		editors.put(O_HCObject.Options.TEXT_ALIGN.getValue(), new DefaultCellEditor(combo1));
 		editors.put(O_HCObject.Options.BORDER_TYPE.getValue(), new DefaultCellEditor(combo2));
 		editors.put(O_HCObject.Options.BACKGROUND_OPAQUE.getValue(), new DefaultCellEditor(new JCheckBox()));
+		editors.put(O_HCObject.Options.FIX_SHAPE.getValue(), new DefaultCellEditor(new JCheckBox()));
 		
 		initTable();
 		
@@ -365,6 +394,7 @@ public class D_LayoutEditorDialog extends JDialog {
 			dtm.addRow(new Object[] {"테두리 색", ""});
 			dtm.addRow(new Object[] {"배경 색", ""});
 			dtm.addRow(new Object[] {"불투명 배경", ""});
+			dtm.addRow(new Object[] {"고정", ""});
 		} else {
 			dtm.setValueAt(selectedObject.getHCName(), O_HCObject.Options.NAME.getValue(), 1); // 이름
 			dtm.setValueAt(selectFrame.getLocation().x + 1, O_HCObject.Options.POS_X.getValue(), 1); // x
@@ -390,47 +420,60 @@ public class D_LayoutEditorDialog extends JDialog {
 			
 			dtm.setValueAt(Util.colorToString(selectedObject.getBackground()), O_HCObject.Options.BACKGROUND_COLOR.getValue(), 1); // 배경 색
 			dtm.setValueAt(selectedObject.isOpaque(), O_HCObject.Options.BACKGROUND_OPAQUE.getValue(), 1); // 불투명 배경
+			dtm.setValueAt(selectedObject.isFixShape(), O_HCObject.Options.FIX_SHAPE.getValue(), 1); // 모양, 위치 고정
 		}
 	}
 	
 	public void save() {
-		for(int i=0; i<objectList.size(); i++) {
-			O_HCObject object = objectList.get(i);
-			
-			String name = object.getHCName();
-			int x = object.getLocation().x;
-			int y = object.getLocation().y;
-			int width = object.getSize().width;
-			int height = object.getSize().height;
-			
-			String textSTR = "";
-			String text = object.getText();
-			if(text.equals(""))
-				textSTR = ";;;;";
-			else {
-				Font font = object.getFont();
-				Color textColor = object.getForeground();
-				int textAlign = object.getHorizontalAlignment();
-				textSTR = text + ";" + Util.fontToString(font) + ";" + Util.colorToString(textColor) + ";" + Util.alignTypeToString(textAlign) + ";";
+		BufferedWriter bw = null;
+		
+		try {
+			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), "UTF8"));
+			for(int i=0; i<objectList.size(); i++) {
+				O_HCObject object = objectList.get(i);
+				
+				String name = object.getHCName();
+				int x = object.getLocation().x;
+				int y = object.getLocation().y;
+				int width = object.getSize().width;
+				int height = object.getSize().height;
+				
+				String textSTR = "";
+				String text = object.getText();
+				if(text.equals(""))
+					textSTR = ";;;;";
+				else {
+					Font font = object.getFont();
+					Color textColor = object.getForeground();
+					int textAlign = object.getHorizontalAlignment();
+					textSTR = text + ";" + Util.fontToString(font) + ";" + Util.colorToString(textColor) + ";" + Util.alignTypeToString(textAlign) + ";";
+				}
+				
+				String borderSTR = "";
+				O_HCObject.BorderType borderType = object.getBorderType();
+				
+				if(borderType == null)
+					borderSTR = ";0;;";
+				else {
+					int borderThickness = object.getBorderThickness();
+					Color borderColor = object.getBorderColor();
+					borderSTR = borderType.getValue() + ";" + borderThickness + ";" + Util.colorToString(borderColor) + ";";
+				}
+				
+				Color bgColor = object.getBackground();
+				boolean bgOpaque = object.isOpaque();
+				boolean fixShape = object.isFixShape();
+				
+				String res = name + ";" + x + ";" + y + ";" + width + ";" + height + ";" + textSTR + borderSTR + Util.colorToString(bgColor) + ";" + bgOpaque + ";" + fixShape + ";";
+				bw.write(res);
+				if(i != objectList.size() - 1)
+					bw.newLine();
 			}
-			
-			String borderSTR = "";
-			O_HCObject.BorderType borderType = object.getBorderType();
-			
-			if(borderType == null)
-				borderSTR = ";0;;";
-			else {
-				int borderThickness = object.getBorderThickness();
-				Color borderColor = object.getBorderColor();
-				borderSTR = borderType.getValue() + ";" + borderThickness + ";" + Util.colorToString(borderColor) + ";";
-			}
-			
-			Color bgColor = object.getBackground();
-			boolean bgOpaque = object.isOpaque();
-			
-			String res = name + ";" + x + ";" + y + ";" + width + ";" + height + ";" + textSTR + borderSTR + Util.colorToString(bgColor) + ";" + bgOpaque + ";";
-			
-			System.out.println(res);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if(bw != null)
+				try { bw.close(); } catch(IOException e) {e.printStackTrace(System.err);}
 		}
 	}
 	
@@ -470,8 +513,9 @@ public class D_LayoutEditorDialog extends JDialog {
 				
 				Color bgColor = Util.stringToColor(splits[O_HCObject.Options.BACKGROUND_COLOR.getValue()]);
 				boolean bgOpaque = Boolean.valueOf(splits[O_HCObject.Options.BACKGROUND_OPAQUE.getValue()]);
+				boolean fixShape = Boolean.valueOf(splits[O_HCObject.Options.FIX_SHAPE.getValue()]);
 				
-				O_HCObject object = new O_HCObject(name, x, y, width, height, text, font, textColor, textAlign, borderType, borderThickness, borderColor, bgColor, bgOpaque);
+				O_HCObject object = new O_HCObject(name, x, y, width, height, text, font, textColor, textAlign, borderType, borderThickness, borderColor, bgColor, bgOpaque, fixShape);
 				field.add(object);
 				objectList.add(object);
 				object.addMouseListener(new ObjectSelectAdapter(object));
@@ -511,7 +555,7 @@ public class D_LayoutEditorDialog extends JDialog {
 		private ObjectDragAdapter(O_HCObject obj) { this.obj = obj; }
 		
 		public void mouseDragged(MouseEvent e) {
-			if(selectedObject != null && selectedObject.equals(obj)) {
+			if(selectedObject != null && selectedObject.equals(obj) && !selectedObject.isFixShape()) {
 				Point p = MouseInfo.getPointerInfo().getLocation();
 				SwingUtilities.convertPointFromScreen(p, field);
 				selectFrame.setLocation(p);
@@ -526,7 +570,7 @@ public class D_LayoutEditorDialog extends JDialog {
 		public void keyPressed(KeyEvent e) {
 			if(selectedObject != null) {
 				if((e.getModifiersEx() == 128 || e.getModifiersEx() == 2) && e.getKeyCode() != KeyEvent.VK_CONTROL) { // Ctrl 을 누른 상태라면
-					if(e.getKeyCode() == KeyEvent.VK_LEFT) {
+					if(e.getKeyCode() == KeyEvent.VK_LEFT && !selectedObject.isFixShape()) {
 						Dimension d = selectedObject.getSize();
 						if(d.width <= 1)
 							return;
@@ -534,13 +578,13 @@ public class D_LayoutEditorDialog extends JDialog {
 			        	selectedObject.setSize(d.width - 1, selectFrame.getSize().height - 2);
 			        	dtm.setValueAt(selectedObject.getSize().width, 3, 1);
 						dtm.setValueAt(selectedObject.getSize().height, 4, 1);
-					} else if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
+					} else if(e.getKeyCode() == KeyEvent.VK_RIGHT && !selectedObject.isFixShape()) {
 						Dimension d = selectedObject.getSize();
 			        	selectFrame.setSize(d.width + 3, selectFrame.getSize().height);
 			        	selectedObject.setSize(d.width + 1, selectFrame.getSize().height - 2);
 			        	dtm.setValueAt(selectedObject.getSize().width, 3, 1);
 						dtm.setValueAt(selectedObject.getSize().height, 4, 1);
-					} else if(e.getKeyCode() == KeyEvent.VK_UP) {
+					} else if(e.getKeyCode() == KeyEvent.VK_UP && !selectedObject.isFixShape()) {
 						Dimension d = selectedObject.getSize();
 						if(d.height <= 1)
 							return;
@@ -548,7 +592,7 @@ public class D_LayoutEditorDialog extends JDialog {
 			        	selectedObject.setSize(selectFrame.getSize().width - 2, d.height - 1);
 			        	dtm.setValueAt(selectedObject.getSize().width, 3, 1);
 						dtm.setValueAt(selectedObject.getSize().height, 4, 1);
-					} else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
+					} else if(e.getKeyCode() == KeyEvent.VK_DOWN && !selectedObject.isFixShape()) {
 						Dimension d = selectedObject.getSize();
 			        	selectFrame.setSize(selectFrame.getSize().width, d.height + 3);
 			        	selectedObject.setSize(selectFrame.getSize().width - 2, d.height + 1);
@@ -558,19 +602,19 @@ public class D_LayoutEditorDialog extends JDialog {
 				} else { // 아니라면
 					if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 						unselect();
-					} else if(e.getKeyCode() == KeyEvent.VK_LEFT) {
+					} else if(e.getKeyCode() == KeyEvent.VK_LEFT && !selectedObject.isFixShape()) {
 						selectFrame.setLocation(selectFrame.getLocation().x - 1, selectFrame.getLocation().y);
 						dtm.setValueAt(selectFrame.getLocation().x + 1, 1, 1);
 						dtm.setValueAt(selectFrame.getLocation().y + 1, 2, 1);
-					} else if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
+					} else if(e.getKeyCode() == KeyEvent.VK_RIGHT && !selectedObject.isFixShape()) {
 						selectFrame.setLocation(selectFrame.getLocation().x + 1, selectFrame.getLocation().y);
 						dtm.setValueAt(selectFrame.getLocation().x + 1, 1, 1);
 						dtm.setValueAt(selectFrame.getLocation().y + 1, 2, 1);
-					}  else if(e.getKeyCode() == KeyEvent.VK_UP) {
+					}  else if(e.getKeyCode() == KeyEvent.VK_UP && !selectedObject.isFixShape()) {
 						selectFrame.setLocation(selectFrame.getLocation().x, selectFrame.getLocation().y - 1);
 						dtm.setValueAt(selectFrame.getLocation().x + 1, 1, 1);
 						dtm.setValueAt(selectFrame.getLocation().y + 1, 2, 1);
-					} else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
+					} else if(e.getKeyCode() == KeyEvent.VK_DOWN && !selectedObject.isFixShape()) {
 						selectFrame.setLocation(selectFrame.getLocation().x, selectFrame.getLocation().y + 1);
 						dtm.setValueAt(selectFrame.getLocation().x + 1, 1, 1);
 						dtm.setValueAt(selectFrame.getLocation().y + 1, 2, 1);

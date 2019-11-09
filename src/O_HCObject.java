@@ -16,9 +16,11 @@ public class O_HCObject extends JLabel {
 	private int borderThickness;
 	private Color borderColor;
 	
-	public O_HCObject(String name) { this(name, 10, 10, 150, 20, "텍스트를 입력하세요.", new Font("굴림", Font.PLAIN, 13), new Color(51, 51, 51), SwingConstants.LEFT, null, 0, null, new Color(255, 255, 255), true); }
+	private boolean fixShape;
 	
-	public O_HCObject(String name, int locX, int locY, int width, int height, String text, Font font, Color textColor, int textAlign, BorderType borderType, int borderThickness, Color borderColor, Color bgColor, boolean bgOpaque) {
+	public O_HCObject(String name) { this(name, 10, 10, 150, 20, "텍스트를 입력하세요.", new Font("굴림", Font.PLAIN, 13), new Color(51, 51, 51), SwingConstants.LEFT, null, 0, null, new Color(255, 255, 255), true, false); }
+	
+	public O_HCObject(String name, int locX, int locY, int width, int height, String text, Font font, Color textColor, int textAlign, BorderType borderType, int borderThickness, Color borderColor, Color bgColor, boolean bgOpaque, boolean fixShape) {
 		this.name = name;
 		setLocation(locX, locY);
 		setSize(width, height);
@@ -31,6 +33,7 @@ public class O_HCObject extends JLabel {
 		this.borderColor = borderColor;
 		setBackground(bgColor);
 		setOpaque(bgOpaque);
+		this.fixShape = fixShape;
 		
 		applyBorder();
 	}
@@ -39,6 +42,7 @@ public class O_HCObject extends JLabel {
 	public BorderType getBorderType() { return borderType; }
 	public int getBorderThickness() { return borderThickness; }
 	public Color getBorderColor() { return borderColor; }
+	public boolean isFixShape() { return fixShape; }
 	
 	public void setHCName(String name) { this.name = name; }
 	public void setBorderType(BorderType borderType) {
@@ -58,6 +62,7 @@ public class O_HCObject extends JLabel {
 		this.borderColor = borderColor;
 		applyBorder();
 	}
+	public void setFixShape(boolean fixShape) { this.fixShape = fixShape; }
 	
 	private void applyBorder() {
 		if(borderType == BorderType.LINE)
@@ -75,7 +80,7 @@ public class O_HCObject extends JLabel {
 	
 	public enum Options {
 		NAME(0), POS_X(1), POS_Y(2), WIDTH(3), HEIGHT(4), TEXT(5), FONT(6), TEXT_COLOR(7), TEXT_ALIGN(8), 
-		BORDER_TYPE(9), BORDER_THICK(10), BORDER_COLOR(11), BACKGROUND_COLOR(12), BACKGROUND_OPAQUE(13);
+		BORDER_TYPE(9), BORDER_THICK(10), BORDER_COLOR(11), BACKGROUND_COLOR(12), BACKGROUND_OPAQUE(13), FIX_SHAPE(14);
 		
 		private final int value;
 		private Options(int value) { this.value = value; }

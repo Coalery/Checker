@@ -132,6 +132,13 @@ public class D_SqliteShowDialog extends JDialog {
 		dtm = new DefaultTableModel(new String[][] {}, new String[] {"학번", "이름", "유형", "출력 날짜", "출력 시간", "선생님", "그 외"}) {
 			public boolean isCellEditable(int row, int column) { return false; }
 		};
+		
+		dataList = E_SqliteDBManager.getData("select * from log");
+		for(int i=0; i<dataList.size(); i++) {
+			E_SqliteDataSet ds = dataList.get(i);
+			dtm.addRow(new String[] {String.valueOf(ds.getNumber()), ds.getName(), ds.getType(), ds.getWriteDate().toString(), ds.getWriteTime().toString(), ds.getTeacher(), ds.getETC()});
+		}
+		
 		JTable table = new JTable(dtm);
 		JScrollPane tableScroll = new JScrollPane(table);
 		

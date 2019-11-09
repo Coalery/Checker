@@ -176,11 +176,11 @@ public class D_OptionDialog extends JDialog {
 		@Override
 		public void actionPerformed(ActionEvent event) {
 			String layoutPath = Util.getConfig("layout" + index + "Path");
-			
-			if(new File(layoutPath).exists())
-				new D_LayoutEditorDialog(D_OptionDialog.this, layoutPath);
-			else
-				Util.showMessage("서식 파일이 존재하지 않습니다.\n옵션을 다시 열어주세요.", JOptionPane.ERROR_MESSAGE);
+			if(!new File(layoutPath).exists()) {
+				Util.showMessage("서식 파일이 존재하지 않습니다.\n기본 레이아웃 파일을 다시 불러옵니다.", JOptionPane.ERROR_MESSAGE);
+				Util.createLayoutFile();
+			}
+			new D_LayoutEditorDialog(D_OptionDialog.this, layoutPath);
 		}
 	}
 	
