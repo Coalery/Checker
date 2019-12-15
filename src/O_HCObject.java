@@ -7,9 +7,6 @@ import javax.swing.SwingConstants;
 
 @SuppressWarnings("serial")
 public class O_HCObject extends JLabel {
-	
-	// 이름, 위치, 크기, 글꼴, 글꼴 크기, 글꼴 형태
-	
 	private String name;
 	
 	private BorderType borderType;

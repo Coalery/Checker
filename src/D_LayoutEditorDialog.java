@@ -9,6 +9,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -22,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Stack;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -37,7 +39,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
@@ -45,9 +46,6 @@ import javax.swing.table.TableCellEditor;
 
 @SuppressWarnings("serial")
 public class D_LayoutEditorDialog extends JDialog {
-	
-	public static final String[] availableFontsName = {"굴림", "굴림체", "궁서", "궁서체", "돋움", "돋움체", "바탕", "바탕체", "함초롬돋움", "함초롬바탕"};
-	// TODO 수정 ( OptionDialog )
 	
 	private final int A4_WIDTH = 210;
 	private final int A4_HEIGHT = 297;
@@ -66,10 +64,15 @@ public class D_LayoutEditorDialog extends JDialog {
 	
 	private String filePath;
 	
+	private Stack<J_Job> jobStack;
+	private Stack<J_Job> nextStack;
+	
 	public D_LayoutEditorDialog(JDialog parent, String filePath) {
 		super(parent, "서식 에디터", true);
 		
 		this.filePath = filePath;
+		jobStack = new Stack<J_Job>();
+		nextStack = new Stack<J_Job>();
 		selectedObject = null;
 		editors = new HashMap<Integer, TableCellEditor>();
 		objectList = new ArrayList<O_HCObject>();
@@ -80,6 +83,7 @@ public class D_LayoutEditorDialog extends JDialog {
 			setVisible(false);
 			dispose();
 		}});
+		addKeyListener(new ShortCutKeyAdapter());
 		
 		field = new JPanel();
 		field.setPreferredSize(new Dimension((int)(A4_WIDTH * A4_WEIGHT), (int)(A4_HEIGHT * A4_WEIGHT)));
@@ -111,8 +115,12 @@ public class D_LayoutEditorDialog extends JDialog {
 			initTable();
 			
 			field.repaint();
+			
+			jobStack.push(new J_Job(J_Job.J_JobType.CREATE, new J_DefineJob(object)));
+			nextStack.clear();
 		}});
 		create.setFocusable(false);
+		create.addKeyListener(new ShortCutKeyAdapter());
 		
 		JButton save = new JButton("저장");
 		save.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -126,6 +134,7 @@ public class D_LayoutEditorDialog extends JDialog {
 			save();
 		}});
 		save.setFocusable(false);
+		save.addKeyListener(new ShortCutKeyAdapter());
 		
 		currentSelect = new JLabel("현재 선택 : 없음");
 		currentSelect.setSize(250, 24);
@@ -160,6 +169,7 @@ public class D_LayoutEditorDialog extends JDialog {
 				return super.getCellEditor(row, column);
 			}
 		};
+		fieldTable.addKeyListener(new ShortCutKeyAdapter());
 		fieldTable.addMouseListener(new MouseAdapter() {public void mouseClicked(MouseEvent event) {
 			if(selectedObject == null)
 				return;
@@ -170,6 +180,8 @@ public class D_LayoutEditorDialog extends JDialog {
 				new D_FontDialog(D_LayoutEditorDialog.this, selectedObject, new FontCallback() {
 					@Override
 					public void callback(Font f) {
+						jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.FONT, selectedObject, selectedObject.getFont(), f)));
+						nextStack.clear();
 						selectedObject.setFont(f);
 						initTable();
 					}
@@ -178,6 +190,8 @@ public class D_LayoutEditorDialog extends JDialog {
 				new D_ColorPicker(D_LayoutEditorDialog.this, selectedObject.getForeground(), new ColorCallback() {
 					@Override
 					public void callback(Color c) {
+						jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.TEXT_COLOR, selectedObject, selectedObject.getForeground(), c)));
+						nextStack.clear();
 						selectedObject.setForeground(c);
 						initTable();
 					}
@@ -188,6 +202,8 @@ public class D_LayoutEditorDialog extends JDialog {
 				new D_ColorPicker(D_LayoutEditorDialog.this, selectedObject.getBorderColor(), new ColorCallback() {
 					@Override
 					public void callback(Color c) {
+						jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.BORDER_COLOR, selectedObject, selectedObject.getBorderColor(), c)));
+						nextStack.clear();
 						selectedObject.setBorderColor(c);
 						initTable();
 					}
@@ -196,6 +212,8 @@ public class D_LayoutEditorDialog extends JDialog {
 				new D_ColorPicker(D_LayoutEditorDialog.this, selectedObject.getBackground(), new ColorCallback() {
 					@Override
 					public void callback(Color c) {
+						jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.BACKGROUND_COLOR, selectedObject, selectedObject.getBackground(), c)));
+						nextStack.clear();
 						selectedObject.setBackground(c);
 						initTable();
 					}
@@ -211,11 +229,16 @@ public class D_LayoutEditorDialog extends JDialog {
 		fieldTable.getColumnModel().getColumn(1).setPreferredWidth(700);
 		
 		new TableCellListener(fieldTable, new AbstractAction() {public void actionPerformed(ActionEvent e) {
+			if(selectedObject == null)
+				return;
+			
 			TableCellListener tcl = (TableCellListener)e.getSource();
 			if(tcl.getOldValue().equals(tcl.getNewValue()) || tcl.getOldValue() == tcl.getNewValue())
 	        	return;
 	        
 	        if(tcl.getRow() == O_HCObject.Options.NAME.getValue()) {
+	        	jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.NAME, selectedObject, tcl.getOldValue(), tcl.getNewValue())));
+	        	nextStack.clear();
 	        	selectedObject.setHCName((String)tcl.getNewValue());
 	        	currentSelect.setText("현재 선택 : " + tcl.getNewValue());
 	        } else if(tcl.getRow() == O_HCObject.Options.POS_X.getValue()) {
@@ -230,6 +253,13 @@ public class D_LayoutEditorDialog extends JDialog {
 	        		dtm.setValueAt(tcl.getOldValue(), O_HCObject.Options.POS_X.getValue(), 1);
 	        		return;
 	        	}
+	        	
+	        	Point privLocation = new Point(selectFrame.getLocation().x + 1, selectFrame.getLocation().y + 1);
+	        	Point nextLocation = new Point(x, selectFrame.getLocation().y + 1);
+	        	
+	        	jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.POS_X, selectedObject, privLocation, nextLocation)));
+	        	nextStack.clear();
+	        	
 	        	dtm.setValueAt(x, O_HCObject.Options.POS_X.getValue(), 1);
 	        	selectFrame.setLocation(x - 1, selectFrame.getLocation().y);
 	        } else if(tcl.getRow() == O_HCObject.Options.POS_Y.getValue()) {
@@ -244,6 +274,13 @@ public class D_LayoutEditorDialog extends JDialog {
 	        		dtm.setValueAt(tcl.getOldValue(), O_HCObject.Options.POS_Y.getValue(), 1);
 	        		return;
 	        	}
+	        	
+	        	Point privLocation = new Point(selectFrame.getLocation().x + 1, selectFrame.getLocation().y + 1);
+	        	Point nextLocation = new Point(selectFrame.getLocation().x + 1, y);
+	        	
+	        	jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.POS_X, selectedObject, privLocation, nextLocation)));
+	        	nextStack.clear();
+	        	
 	        	dtm.setValueAt(y, O_HCObject.Options.POS_Y.getValue(), 1);
 	        	selectFrame.setLocation(selectFrame.getLocation().x, y - 1);
 	        } else if(tcl.getRow() == O_HCObject.Options.WIDTH.getValue()) {
@@ -258,6 +295,10 @@ public class D_LayoutEditorDialog extends JDialog {
 	        		dtm.setValueAt(tcl.getOldValue(), O_HCObject.Options.WIDTH.getValue(), 1);
 	        		return;
 	        	}
+	        	
+	        	jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.WIDTH, selectedObject, selectedObject.getSize().width, width)));
+	        	nextStack.clear();
+	        	
 	        	dtm.setValueAt(width, O_HCObject.Options.WIDTH.getValue(), 1);
 	        	selectFrame.setSize(width + 2, selectFrame.getSize().height);
 	        	selectedObject.setSize(width, selectFrame.getSize().height - 2);
@@ -273,35 +314,57 @@ public class D_LayoutEditorDialog extends JDialog {
 	        		dtm.setValueAt(tcl.getOldValue(), O_HCObject.Options.HEIGHT.getValue(), 1);
 	        		return;
 	        	}
+	        	
+	        	jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.HEIGHT, selectedObject, selectedObject.getSize().height, height)));
+	        	nextStack.clear();
+	        	
 	        	dtm.setValueAt(height, O_HCObject.Options.HEIGHT.getValue(), 1);
 	        	selectFrame.setSize(selectFrame.getSize().width, height + 2);
 	        	selectedObject.setSize(selectFrame.getSize().width - 2, height);
 	        } else if(tcl.getRow() == O_HCObject.Options.TEXT.getValue()) {
+	        	jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.TEXT, selectedObject, tcl.getOldValue(), tcl.getNewValue())));
+	        	nextStack.clear();
 	        	selectedObject.setText((String)tcl.getNewValue());
 	        } else if(tcl.getRow() == O_HCObject.Options.TEXT_ALIGN.getValue()) {
-	        	String align = (String)tcl.getNewValue();
-	        	if(align.equals("왼쪽"))
-	        		selectedObject.setHorizontalAlignment(SwingConstants.LEFT);
-	        	if(align.equals("가운데"))
-	        		selectedObject.setHorizontalAlignment(SwingConstants.CENTER);
-	        	if(align.equals("오른쪽"))
-	        		selectedObject.setHorizontalAlignment(SwingConstants.RIGHT);
+	        	int privAlign = Util.stringToAlignType((String)tcl.getOldValue());
+	        	int nextAlign = Util.stringToAlignType((String)tcl.getNewValue());
+	        	jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.TEXT_ALIGN, selectedObject, privAlign, nextAlign)));
+	        	nextStack.clear();
+	        	selectedObject.setHorizontalAlignment(nextAlign);
 	        } else if(tcl.getRow() == O_HCObject.Options.BORDER_TYPE.getValue()) {
-	        	selectedObject.setBorderType(O_HCObject.BorderType.valueOfLabel((String)tcl.getNewValue()));
+	        	O_HCObject.BorderType privType = O_HCObject.BorderType.valueOfLabel((String)tcl.getOldValue());
+	        	O_HCObject.BorderType nextType = O_HCObject.BorderType.valueOfLabel((String)tcl.getNewValue());
+	        	jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.BORDER_TYPE, selectedObject, privType, nextType)));
+	        	nextStack.clear();
+	        	selectedObject.setBorderType(nextType);
 	        	initTable();
 	        } else if(tcl.getRow() == O_HCObject.Options.BORDER_THICK.getValue()) {
-	        	int thick = -1;
-	        	try { thick = Integer.parseInt((String)tcl.getNewValue()); } catch(NumberFormatException ex) {
-	        		Util.showMessage("숫자만 입력할 수 있습니다.", JOptionPane.ERROR_MESSAGE);
-	        		dtm.setValueAt(tcl.getOldValue(), O_HCObject.Options.BORDER_COLOR.getValue(), 1);
-	        		return;
+	        	int nextThick = -1;
+	        	if(tcl.getNewValue() instanceof Integer)
+	        		nextThick = (int)tcl.getNewValue();
+	        	else if(tcl.getNewValue() instanceof String) {
+		        	try { nextThick = Integer.parseInt((String)tcl.getNewValue()); } catch(NumberFormatException ex) {
+		        		Util.showMessage("숫자만 입력할 수 있습니다.", JOptionPane.ERROR_MESSAGE);
+		        		dtm.setValueAt(tcl.getOldValue(), O_HCObject.Options.BORDER_COLOR.getValue(), 1);
+		        		return;
+		        	}
 	        	}
-	        	dtm.setValueAt(thick, O_HCObject.Options.BORDER_THICK.getValue(), 1);
-	        	selectedObject.setBorderThickness(thick);
+	        	int privThick = (int)tcl.getOldValue();
+	        	jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.BORDER_THICK, selectedObject, privThick, nextThick)));
+	        	nextStack.clear();
+	        	selectedObject.setBorderThickness(nextThick);
 	        } else if(tcl.getRow() == O_HCObject.Options.BACKGROUND_OPAQUE.getValue()) {
-	        	selectedObject.setOpaque((boolean)tcl.getNewValue());
+	        	boolean privOpaque = (boolean)tcl.getOldValue();
+	        	boolean nextOpaque = (boolean)tcl.getNewValue();
+	        	jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.BACKGROUND_OPAQUE, selectedObject, privOpaque, nextOpaque)));
+	        	nextStack.clear();
+	        	selectedObject.setOpaque(nextOpaque);
 	        	repaint();
 	        } else if(tcl.getRow() == O_HCObject.Options.FIX_SHAPE.getValue()) {
+	        	boolean privFix = (boolean)tcl.getOldValue();
+	        	boolean nextFix = (boolean)tcl.getNewValue();
+	        	jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.FIX_SHAPE, selectedObject, privFix, nextFix)));
+	        	nextStack.clear();
 	        	selectedObject.setFixShape((boolean)tcl.getNewValue());
 	        	repaint();
 	        }
@@ -349,6 +412,14 @@ public class D_LayoutEditorDialog extends JDialog {
 		selectFrame.remove(selectedObject);
 		O_HCObject obj = selectedObject;
 		obj.setLocation(selectFrame.getLocation().x + 1, selectFrame.getLocation().y + 1);
+		
+		obj.removeMouseMotionListener(obj.getMouseMotionListeners()[0]);
+		MouseListener[] mouseListeners = obj.getMouseListeners();
+		
+		for(int i=0; i<mouseListeners.length; i++)
+			if(mouseListeners[i] instanceof ObjectDragMoveAdapter)
+				obj.removeMouseListener(mouseListeners[i]);
+		
 		selectedObject = null;
 		currentSelect.setText("현재 선택 : 없음");
 		initTable();
@@ -369,6 +440,7 @@ public class D_LayoutEditorDialog extends JDialog {
 		currentSelect.setText("현재 선택 : " + obj.getHCName());
 		selectedObject = obj;
 		selectedObject.addMouseMotionListener(new ObjectDragAdapter(obj));
+		selectedObject.addMouseListener(new ObjectDragMoveAdapter(obj));
 		
 		field.remove(obj);
 		field.add(selectFrame);
@@ -540,13 +612,240 @@ public class D_LayoutEditorDialog extends JDialog {
 		return true;
 	}
 	
+	public void priv() {
+		if(jobStack.empty())
+			return;
+		J_Job job = jobStack.pop();
+		
+		if(job.getJobType() == J_Job.J_JobType.CREATE) {
+			J_DefineJob defjob = (J_DefineJob)job.getJob();
+			O_HCObject target = defjob.getTarget();
+			
+			if(!objectList.contains(target))
+				return;
+			
+			if(target.equals(selectedObject)) {
+				selectFrame.remove(selectedObject);
+				selectedObject = null;
+				currentSelect.setText("현재 선택 : 없음");
+				initTable();
+				field.remove(selectFrame);
+			}
+			objectList.remove(target);
+			field.remove(target);
+			
+			field.repaint();
+		} else if(job.getJobType() == J_Job.J_JobType.REMOVE) {
+			J_DefineJob defjob = (J_DefineJob)job.getJob();
+			
+			O_HCObject object = defjob.getTarget();
+			if(objectList.contains(object))
+				return;
+			
+			field.add(object);
+			objectList.add(object);
+			object.addMouseListener(new ObjectSelectAdapter(object));
+			
+			select(object);
+			initTable();
+			
+			field.repaint();
+		} else if(job.getJobType() == J_Job.J_JobType.VALUE_CHANGE) {
+			J_ValueChangeJob changejob = (J_ValueChangeJob)job.getJob();
+			
+			O_HCObject object = changejob.getTarget();
+			if(!objectList.contains(object))
+				return;
+			
+			if(changejob.getChangeType() == O_HCObject.Options.NAME)
+				object.setName((String)changejob.getPrivValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.POS_X) { // 위치 변경
+				if(selectedObject.equals(object)) {
+					Point privLocation = (Point)changejob.getPrivValue();
+					
+					selectFrame.setLocation(privLocation.x - 1, privLocation.y - 1);
+					dtm.setValueAt(privLocation.x, 1, 1);
+					dtm.setValueAt(privLocation.y, 2, 1);
+				} else
+					object.setLocation((Point)changejob.getPrivValue());
+			} else if(changejob.getChangeType() == O_HCObject.Options.WIDTH) {
+				if(selectedObject.equals(object)) {
+					int privWidth = (int)changejob.getPrivValue();
+					
+					selectFrame.setSize(privWidth + 2, selectFrame.getSize().height);
+		        	selectedObject.setSize(privWidth, selectFrame.getSize().height - 2);
+		        	dtm.setValueAt(selectedObject.getSize().width, 3, 1);
+					dtm.setValueAt(selectedObject.getSize().height, 4, 1);
+				} else
+					object.setSize((int)changejob.getPrivValue(), (int)object.getSize().getHeight());
+			} else if(changejob.getChangeType() == O_HCObject.Options.HEIGHT) {
+				if(selectedObject.equals(object)) {
+					int privHeight = (int)changejob.getPrivValue();
+					
+					selectFrame.setSize(selectFrame.getSize().width, privHeight + 2);
+		        	selectedObject.setSize(selectFrame.getSize().width - 2, privHeight);
+		        	dtm.setValueAt(selectedObject.getSize().width, 3, 1);
+					dtm.setValueAt(selectedObject.getSize().height, 4, 1);
+				} else
+					object.setSize((int)object.getSize().getWidth(), (int)changejob.getPrivValue());
+			} else if(changejob.getChangeType() == O_HCObject.Options.TEXT)
+				object.setText((String)changejob.getPrivValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.FONT)
+				object.setFont((Font)changejob.getPrivValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.TEXT_COLOR)
+				object.setForeground((Color)changejob.getPrivValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.TEXT_ALIGN)
+				object.setHorizontalAlignment((int)changejob.getPrivValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.BORDER_TYPE) {
+				object.setBorderType((O_HCObject.BorderType)changejob.getPrivValue());
+			} else if(changejob.getChangeType() == O_HCObject.Options.BORDER_THICK)
+				object.setBorderThickness((int)changejob.getPrivValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.BORDER_COLOR)
+				object.setBorderColor((Color)changejob.getPrivValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.BACKGROUND_COLOR)
+				object.setBackground((Color)changejob.getPrivValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.BACKGROUND_OPAQUE)
+				object.setOpaque((boolean)changejob.getPrivValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.FIX_SHAPE)
+				object.setFixShape((boolean)changejob.getPrivValue());
+			
+			initTable();
+			field.repaint();
+		}
+		nextStack.push(job);
+	}
+	
+	public void next() {
+		if(nextStack.empty())
+			return;
+		for(int i=0; i<nextStack.size(); i++)
+			System.out.println(nextStack.get(i));
+		J_Job job = nextStack.pop();
+		
+		if(job.getJobType() == J_Job.J_JobType.CREATE) {
+			J_DefineJob defjob = (J_DefineJob)job.getJob();
+			O_HCObject target = defjob.getTarget();
+			
+			if(objectList.contains(target))
+				return;
+			
+			field.add(target);
+			objectList.add(target);
+			target.addMouseListener(new ObjectSelectAdapter(target));
+			
+			select(target);
+			initTable();
+			
+			field.repaint();
+		} else if(job.getJobType() == J_Job.J_JobType.REMOVE) {
+			J_DefineJob defjob = (J_DefineJob)job.getJob();
+			O_HCObject target = defjob.getTarget();
+			
+			if(!objectList.contains(target))
+				return;
+			
+			if(target.equals(selectedObject)) {
+				target.setLocation(selectFrame.getLocation().x + 1, selectFrame.getLocation().y + 1);
+				selectFrame.remove(selectedObject);
+				selectedObject = null;
+				currentSelect.setText("현재 선택 : 없음");
+				initTable();
+				field.remove(selectFrame);
+			}
+			objectList.remove(target);
+			field.remove(target);
+			
+			field.repaint();
+		} else if(job.getJobType() == J_Job.J_JobType.VALUE_CHANGE) {
+			J_ValueChangeJob changejob = (J_ValueChangeJob)job.getJob();
+			
+			O_HCObject object = changejob.getTarget();
+			if(!objectList.contains(object))
+				return;
+			
+			if(changejob.getChangeType() == O_HCObject.Options.NAME)
+				object.setName((String)changejob.getCurrentValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.POS_X) { // 위치 변경
+				Point curLocation = (Point)changejob.getCurrentValue();
+				if(selectedObject.equals(object)) {
+					selectFrame.setLocation(curLocation.x - 1, curLocation.y - 1);
+					dtm.setValueAt(curLocation.x, 1, 1);
+					dtm.setValueAt(curLocation.y, 2, 1);
+				} else
+					object.setLocation(curLocation);
+			} else if(changejob.getChangeType() == O_HCObject.Options.WIDTH) {
+				if(selectedObject.equals(object)) {
+					int curWidth = (int)changejob.getCurrentValue();
+					
+					selectFrame.setSize(curWidth + 2, selectFrame.getSize().height);
+		        	selectedObject.setSize(curWidth, selectFrame.getSize().height - 2);
+		        	dtm.setValueAt(selectedObject.getSize().width, 3, 1);
+					dtm.setValueAt(selectedObject.getSize().height, 4, 1);
+				} else
+					object.setSize((int)changejob.getCurrentValue(), (int)object.getSize().getHeight());
+			} else if(changejob.getChangeType() == O_HCObject.Options.HEIGHT) {
+				if(selectedObject.equals(object)) {
+					int curHeight = (int)changejob.getCurrentValue();
+					
+					selectFrame.setSize(selectFrame.getSize().width, curHeight + 2);
+		        	selectedObject.setSize(selectFrame.getSize().width - 2, curHeight);
+		        	dtm.setValueAt(selectedObject.getSize().width, 3, 1);
+					dtm.setValueAt(selectedObject.getSize().height, 4, 1);
+				} else
+					object.setSize((int)object.getSize().getWidth(), (int)changejob.getCurrentValue());
+			} else if(changejob.getChangeType() == O_HCObject.Options.TEXT)
+				object.setText((String)changejob.getCurrentValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.FONT)
+				object.setFont((Font)changejob.getCurrentValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.TEXT_COLOR)
+				object.setForeground((Color)changejob.getCurrentValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.TEXT_ALIGN)
+				object.setHorizontalAlignment((int)changejob.getCurrentValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.BORDER_TYPE) {
+				object.setBorderType((O_HCObject.BorderType)changejob.getCurrentValue());
+			} else if(changejob.getChangeType() == O_HCObject.Options.BORDER_THICK)
+				object.setBorderThickness((int)changejob.getCurrentValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.BORDER_COLOR)
+				object.setBorderColor((Color)changejob.getCurrentValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.BACKGROUND_COLOR)
+				object.setBackground((Color)changejob.getCurrentValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.BACKGROUND_OPAQUE)
+				object.setOpaque((boolean)changejob.getCurrentValue());
+			else if(changejob.getChangeType() == O_HCObject.Options.FIX_SHAPE)
+				object.setFixShape((boolean)changejob.getCurrentValue());
+			
+			initTable();
+			field.repaint();
+		}
+		jobStack.push(job);
+	}
+	
 	private class ObjectSelectAdapter extends MouseAdapter {
 		private O_HCObject obj;
 		private ObjectSelectAdapter(O_HCObject obj) { this.obj = obj; }
 		
+		@Override
 		public void mouseReleased(MouseEvent e) {
 			if(selectedObject == null || !selectedObject.equals(obj))
 				select(obj);
+		}
+	}
+	
+	private class ObjectDragMoveAdapter extends MouseAdapter {
+		private Point privPoint;
+		private O_HCObject obj;
+		private ObjectDragMoveAdapter(O_HCObject obj) { this.obj = obj; }
+		
+		@Override
+		public void mousePressed(MouseEvent e) {
+			privPoint = new Point(selectFrame.getLocation().x + 1, selectFrame.getLocation().y + 1);
+		}
+		
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			Point nextPoint = new Point(selectFrame.getLocation().x + 1, selectFrame.getLocation().y + 1);
+			jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.POS_X, obj, privPoint, nextPoint)));
+			nextStack.clear();
 		}
 	}
 	
@@ -554,6 +853,7 @@ public class D_LayoutEditorDialog extends JDialog {
 		private O_HCObject obj;
 		private ObjectDragAdapter(O_HCObject obj) { this.obj = obj; }
 		
+		@Override
 		public void mouseDragged(MouseEvent e) {
 			if(selectedObject != null && selectedObject.equals(obj) && !selectedObject.isFixShape()) {
 				Point p = MouseInfo.getPointerInfo().getLocation();
@@ -563,6 +863,17 @@ public class D_LayoutEditorDialog extends JDialog {
 				dtm.setValueAt(selectFrame.getLocation().x + 1, 1, 1);
 				dtm.setValueAt(selectFrame.getLocation().y + 1, 2, 1);
 			}
+		}
+	}
+	
+	private class ShortCutKeyAdapter extends KeyAdapter {
+		public void keyPressed(KeyEvent e) {
+			if(!((e.getModifiersEx() == 128 || e.getModifiersEx() == 2) && e.getKeyCode() != KeyEvent.VK_CONTROL))
+				return;
+			if(e.getKeyCode() == KeyEvent.VK_Z)
+				priv();
+			else if(e.getKeyCode() == KeyEvent.VK_Y)
+				next();
 		}
 	}
 	
@@ -578,12 +889,18 @@ public class D_LayoutEditorDialog extends JDialog {
 			        	selectedObject.setSize(d.width - 1, selectFrame.getSize().height - 2);
 			        	dtm.setValueAt(selectedObject.getSize().width, 3, 1);
 						dtm.setValueAt(selectedObject.getSize().height, 4, 1);
+						
+						jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.WIDTH, selectedObject, selectedObject.getSize().width + 1, selectedObject.getSize().width)));
+						nextStack.clear();
 					} else if(e.getKeyCode() == KeyEvent.VK_RIGHT && !selectedObject.isFixShape()) {
 						Dimension d = selectedObject.getSize();
 			        	selectFrame.setSize(d.width + 3, selectFrame.getSize().height);
 			        	selectedObject.setSize(d.width + 1, selectFrame.getSize().height - 2);
 			        	dtm.setValueAt(selectedObject.getSize().width, 3, 1);
 						dtm.setValueAt(selectedObject.getSize().height, 4, 1);
+						
+						jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.WIDTH, selectedObject, selectedObject.getSize().width - 1, selectedObject.getSize().width)));
+						nextStack.clear();
 					} else if(e.getKeyCode() == KeyEvent.VK_UP && !selectedObject.isFixShape()) {
 						Dimension d = selectedObject.getSize();
 						if(d.height <= 1)
@@ -592,33 +909,72 @@ public class D_LayoutEditorDialog extends JDialog {
 			        	selectedObject.setSize(selectFrame.getSize().width - 2, d.height - 1);
 			        	dtm.setValueAt(selectedObject.getSize().width, 3, 1);
 						dtm.setValueAt(selectedObject.getSize().height, 4, 1);
+						
+						jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.HEIGHT, selectedObject, selectedObject.getSize().height + 1, selectedObject.getSize().height)));
+						nextStack.clear();
 					} else if(e.getKeyCode() == KeyEvent.VK_DOWN && !selectedObject.isFixShape()) {
 						Dimension d = selectedObject.getSize();
 			        	selectFrame.setSize(selectFrame.getSize().width, d.height + 3);
 			        	selectedObject.setSize(selectFrame.getSize().width - 2, d.height + 1);
 			        	dtm.setValueAt(selectedObject.getSize().width, 3, 1);
 						dtm.setValueAt(selectedObject.getSize().height, 4, 1);
+						
+						jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.HEIGHT, selectedObject, selectedObject.getSize().height - 1, selectedObject.getSize().height)));
+						nextStack.clear();
 					}
 				} else { // 아니라면
 					if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 						unselect();
 					} else if(e.getKeyCode() == KeyEvent.VK_LEFT && !selectedObject.isFixShape()) {
+						Point selectFrameLoc = selectFrame.getLocation();
+						
+						Point privLocation = new Point(selectFrameLoc.x + 1, selectFrameLoc.y + 1);
+						Point nextLocation = new Point(selectFrameLoc.x, 	 selectFrameLoc.y + 1);
+						jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.POS_X, selectedObject, privLocation, nextLocation)));
+						nextStack.clear();
+						
 						selectFrame.setLocation(selectFrame.getLocation().x - 1, selectFrame.getLocation().y);
 						dtm.setValueAt(selectFrame.getLocation().x + 1, 1, 1);
 						dtm.setValueAt(selectFrame.getLocation().y + 1, 2, 1);
 					} else if(e.getKeyCode() == KeyEvent.VK_RIGHT && !selectedObject.isFixShape()) {
+						Point selectFrameLoc = selectFrame.getLocation();
+						
+						Point privLocation = new Point(selectFrameLoc.x + 1, selectFrameLoc.y + 1);
+						Point nextLocation = new Point(selectFrameLoc.x + 2, selectFrameLoc.y + 1);
+						jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.POS_X, selectedObject, privLocation, nextLocation)));
+						nextStack.clear();
+						
 						selectFrame.setLocation(selectFrame.getLocation().x + 1, selectFrame.getLocation().y);
 						dtm.setValueAt(selectFrame.getLocation().x + 1, 1, 1);
 						dtm.setValueAt(selectFrame.getLocation().y + 1, 2, 1);
 					}  else if(e.getKeyCode() == KeyEvent.VK_UP && !selectedObject.isFixShape()) {
+						Point selectFrameLoc = selectFrame.getLocation();
+						
+						Point privLocation = new Point(selectFrameLoc.x + 1, selectFrameLoc.y + 1);
+						Point nextLocation = new Point(selectFrameLoc.x + 1, selectFrameLoc.y);
+						jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.POS_X, selectedObject, privLocation, nextLocation)));
+						nextStack.clear();
+						
 						selectFrame.setLocation(selectFrame.getLocation().x, selectFrame.getLocation().y - 1);
 						dtm.setValueAt(selectFrame.getLocation().x + 1, 1, 1);
 						dtm.setValueAt(selectFrame.getLocation().y + 1, 2, 1);
 					} else if(e.getKeyCode() == KeyEvent.VK_DOWN && !selectedObject.isFixShape()) {
+						Point selectFrameLoc = selectFrame.getLocation();
+						
+						Point privLocation = new Point(selectFrameLoc.x + 1, selectFrameLoc.y + 1);
+						Point nextLocation = new Point(selectFrameLoc.x + 1, selectFrameLoc.y + 2);
+						jobStack.push(new J_Job(J_Job.J_JobType.VALUE_CHANGE, new J_ValueChangeJob(O_HCObject.Options.POS_X, selectedObject, privLocation, nextLocation)));
+						nextStack.clear();
+						
 						selectFrame.setLocation(selectFrame.getLocation().x, selectFrame.getLocation().y + 1);
 						dtm.setValueAt(selectFrame.getLocation().x + 1, 1, 1);
 						dtm.setValueAt(selectFrame.getLocation().y + 1, 2, 1);
 					} else if(e.getKeyCode() == KeyEvent.VK_DELETE) {
+						O_HCObject copyObject = selectedObject;
+						copyObject.setLocation(selectFrame.getLocation().x + 1, selectFrame.getLocation().y + 1);
+						jobStack.push(new J_Job(J_Job.J_JobType.REMOVE, new J_DefineJob(selectedObject)));
+						nextStack.clear();
+						
 						selectFrame.remove(selectedObject);
 						objectList.remove(selectedObject);
 						selectedObject = null;

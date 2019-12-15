@@ -22,6 +22,7 @@ public class D_OptionDialog extends JDialog {
 	private final int OPTION_PANEL_COUNT = 2;
 	
 	private JPanel[] optionPanels;
+	private JTextField fonts;
 	
 	public D_OptionDialog(JFrame owner, boolean visible) {
 		super(owner, "옵션", true);
@@ -43,7 +44,7 @@ public class D_OptionDialog extends JDialog {
 		selectOptionPanel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, new Color(220, 220, 220)));
 		
 		JButton[] selects = new JButton[OPTION_PANEL_COUNT];
-		String[] names = {"일반", "서식 파일"};
+		String[] names = {"일반", "서식"};
 		
 		for(int i=0; i<OPTION_PANEL_COUNT; i++) {
 			selects[i] = new JButton(names[i]);
@@ -109,7 +110,7 @@ public class D_OptionDialog extends JDialog {
 			layoutL.setSize(100, 20);
 			layoutL.setLocation(15, 10 + 30 * i);
 			
-			final JTextField layout = new JTextField(Util.getConfig("layout" + vals[i] + "Path"));
+			JTextField layout = new JTextField(Util.getConfig("layout" + vals[i] + "Path"));
 			layout.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 			layout.setSize(280, 20);
 			layout.setLocation(125, 10 + 30 * i);
@@ -134,6 +135,37 @@ public class D_OptionDialog extends JDialog {
 			optionPanels[1].add(layoutpath);
 			optionPanels[1].add(layoutedit);
 		}
+		
+		JLabel fontL = new JLabel("사용할 글꼴 :");
+		fontL.setFont(defaultFont);
+		fontL.setSize(100, 20);
+		fontL.setLocation(15, 190);
+		
+		String layoutFonts = Util.getConfig("layoutFonts");
+		
+		if(layoutFonts == null) {
+			layoutFonts = "굴림,굴림체,궁서,궁서체,돋움,돋움체,바탕,바탕체,함초롬돋움,함초롬바탕";
+			Util.changeConfig("layoutFonts", layoutFonts);
+		}
+		
+		fonts = new JTextField(layoutFonts);
+		fonts.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		fonts.setSize(280, 20);
+		fonts.setLocation(125, 190);
+		fonts.setEditable(false);
+		
+		JButton fontsEdit = (JButton)Util.getDefaultComponent(new JButton("수정"), Color.WHITE, true);
+		fontsEdit.setFont(defaultFont);
+		fontsEdit.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		fontsEdit.setSize(50, 20);
+		fontsEdit.setLocation(465, 190);
+		fontsEdit.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) {
+			new D_FontEditDialog(D_OptionDialog.this);
+		}});
+		
+		optionPanels[1].add(fontL);
+		optionPanels[1].add(fonts);
+		optionPanels[1].add(fontsEdit);
 		// </OptionPanel_1>
 		
 		optionPanels[0].setVisible(true);
@@ -146,6 +178,10 @@ public class D_OptionDialog extends JDialog {
 		
 		setResizable(false);
 		setVisible(visible);
+	}
+	
+	public void setContentInFontField(String content) {
+		fonts.setText(content);
 	}
 	
 	private class LayoutPathListener implements ActionListener {

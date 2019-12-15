@@ -159,10 +159,7 @@ public class TableCellListener implements PropertyChangeListener, Runnable
 			TableCellListener tcl = new TableCellListener(
 				getTable(), getRow(), getColumn(), getOldValue(), getNewValue());
 
-			ActionEvent event = new ActionEvent(
-				tcl,
-				ActionEvent.ACTION_PERFORMED,
-				"");
+			ActionEvent event = new ActionEvent(tcl, ActionEvent.ACTION_PERFORMED, "");
 			action.actionPerformed(event);
 		}
 	}

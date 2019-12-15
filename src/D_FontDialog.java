@@ -39,7 +39,10 @@ public class D_FontDialog extends JDialog {
 		fontsL.setSize(60, 20);
 		fontsL.setLocation(5, 5);
 		
-		fonts = new JList<>(D_LayoutEditorDialog.availableFontsName); // TODO 수정
+		String layoutFonts = Util.getConfig("layoutFonts");
+		String[] availableFontsName = layoutFonts.split(",");
+		
+		fonts = new JList<>(availableFontsName); // TODO 수정
 		fonts.setSelectedValue(currentFont.getName(), true);
 		fonts.addListSelectionListener(new FontSelectListener());
 		
